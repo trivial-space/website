@@ -1,7 +1,9 @@
 {
   "name": "tvs-website",
   "version": "0.1.0",
-  "private": true,
+  "description": "trivial space website",
+  "author": "Thomas Gorny",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
