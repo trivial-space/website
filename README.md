@@ -1,6 +1,6 @@
 # Trivial space website
 
-This project will eventually become the updated https://trivialspace.net
+This project will eventually become the updated https://www.trivialspace.net
 
 ## License
 
