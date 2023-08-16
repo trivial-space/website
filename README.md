@@ -1,5 +1,7 @@
 # Trivial space website
 
+Build with typescript, solid.js, tailwindcss and motion one.
+
 This project will eventually become the updated https://www.trivialspace.net
 
 ## License

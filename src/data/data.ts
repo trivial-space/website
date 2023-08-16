@@ -1,46 +1,43 @@
-import { StaticImageData } from 'next/image'
-import ColorfieldsImg from '../public/imgs/colorfields.png'
-import ColorwallsImg from '../public/imgs/colorwalls.png'
-import GlassPlatesImg from '../public/imgs/glassplates.png'
-import StrokeImg from '../public/imgs/stroke.png'
-import TilesImg from '../public/imgs/tiles.png'
-
 export interface Sketch {
 	slug: string
-	img: StaticImageData
+	img: string
 	href: string
 	allowFullscreen: boolean
+}
+
+function getImageUrl(name) {
+	return new URL(`./imgs/${name}.png`, import.meta.url).href
 }
 
 export const data: { sketches: Sketch[] } = {
 	sketches: [
 		{
 			slug: 'colorfields',
-			img: ColorfieldsImg,
+			img: getImageUrl('colorfields'),
 			href: 'https://construction.trivialspace.net/experiments/paintings/tiles-and-stripes/',
 			allowFullscreen: false,
 		},
 		{
 			slug: 'colorwalls',
-			img: ColorwallsImg,
+			img: getImageUrl('colorwalls'),
 			href: 'https://construction.trivialspace.net/works/colorwalls/',
 			allowFullscreen: true,
 		},
 		{
 			slug: 'glassplates',
-			img: GlassPlatesImg,
+			img: getImageUrl('glassplates'),
 			href: 'https://construction.trivialspace.net/experiments/wasm/projection/',
 			allowFullscreen: true,
 		},
 		{
 			slug: 'stroke',
-			img: StrokeImg,
+			img: getImageUrl('stroke'),
 			href: 'https://construction.trivialspace.net/experiments/strokes/stroke2/',
 			allowFullscreen: false,
 		},
 		{
 			slug: 'tiles',
-			img: TilesImg,
+			img: getImageUrl('tiles'),
 			href: 'https://construction.trivialspace.net/works/tiles/',
 			allowFullscreen: true,
 		},
