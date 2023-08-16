@@ -48,7 +48,7 @@ export default function Work(props: Props) {
 		>
 			<A
 				href={`/${props.slug}`}
-				class="work-link block mx-4 md:mx-8 object-contain bg-white my-auto border-[4px] rounded-md border-white shadow-xl shadow-slate-400 transition-filter duration-500 ease-in-out origin-center"
+				class="work-link block mx-4 md:mx-8 object-contain bg-white my-auto border-[4px] rounded-md border-white shadow-xl shadow-slate-400 transition-filter duration-500 delay-200 ease-in-out origin-center"
 				classList={{ ['blur-[3px]']: !props.active }}
 				style={{ width: width() + 'px', height: height() + 'px' }}
 			>
