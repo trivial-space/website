@@ -25,7 +25,7 @@ const App: Component = () => {
 				</Routes>
 			</main>
 
-			<footer class="m-4">
+			<footer class="m-4 fixed bottom-0">
 				Made with 🖤 by <a href="https://trival.xyz">Thomas Gorny</a>
 			</footer>
 		</div>
