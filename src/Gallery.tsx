@@ -1,21 +1,30 @@
-import { For, createEffect, createMemo, onMount } from 'solid-js'
+import {
+	For,
+	createEffect,
+	createMemo,
+	createSignal,
+	onCleanup,
+	onMount,
+} from 'solid-js'
 import { useParams } from '@solidjs/router'
 import Work from './Work'
 import { data } from './data/data'
 import { animate, scroll } from 'motion'
+import { useState } from './State'
 
 export default function Gallery() {
 	const params = useParams()
 	let galleryEl: HTMLDivElement
 
 	const workId = createMemo(() => params.id)
+	const state = useState()
 
-	const scrollToActiveWork = () => {
+	const scrollToSelected = () => {
 		let activeWork = document.querySelector(`[data-id="${workId()}"]`)
 
-		if (activeWork) {
+		if (activeWork && galleryEl) {
 			const bound = activeWork.getBoundingClientRect()
-			const width = window.innerWidth
+			const width = state.window.width
 			const leftDelta = width / 2 - bound.left - bound.width / 2
 
 			console.log(bound, leftDelta, width)
@@ -27,7 +36,7 @@ export default function Gallery() {
 		}
 	}
 
-	createEffect(scrollToActiveWork)
+	createEffect(scrollToSelected)
 
 	onMount(() => {
 		let works = document.querySelectorAll('.work-link')
@@ -37,7 +46,7 @@ export default function Gallery() {
 				scroll(
 					animate(work, {
 						rotateY: [-25, 25],
-						scale: [1.25, 1.05, 1, 1.05, 1.25],
+						scale: [1.35, 1.1, 1, 1.1, 1.35],
 						translate: ['20%', '8%', '0%', '-8%', '-20%'],
 					}),
 					{
@@ -49,14 +58,24 @@ export default function Gallery() {
 				)
 			})
 		}
+	})
 
-		scrollToActiveWork()
+	const [lockScroll, setLockScroll] = createSignal(false)
+
+	const timeout2 = setTimeout(scrollToSelected, 1000)
+	const timeout = setTimeout(() => {
+		setLockScroll(true)
+	}, 2000)
+
+	onCleanup(() => {
+		clearTimeout(timeout)
+		clearTimeout(timeout2)
 	})
 
 	return (
 		<div
-			class="h-full flex flex-nowrap overflow-x-auto overflow-y-hidden items-center px-[20vw] transition-transform"
-			classList={{ ['!overflow-hidden']: !!workId() }}
+			class="h-full flex flex-nowrap overflow-x-auto overflow-y-hidden items-center px-[25vw] transition-transform"
+			classList={{ ['!overflow-hidden']: !!workId() && lockScroll() }}
 			ref={galleryEl}
 		>
 			<For each={data.sketches}>

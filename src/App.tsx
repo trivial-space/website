@@ -6,7 +6,7 @@ const App: Component = () => {
 	const navigate = useNavigate()
 	return (
 		<div
-			class="h-full max-h-full flex flex-col"
+			class="h-full w-full"
 			onPointerDown={(e) => {
 				if (
 					!e.target.classList.contains('work-link') &&
@@ -16,19 +16,19 @@ const App: Component = () => {
 				}
 			}}
 		>
-			<header class="">
-				<h1 class="m-2 md:m-4 text-2xl md:text-4xl uppercase font-extralight tracking-widest">
+			<header class="fixed top-0">
+				<h1 class="m-2 mb-0 md:m-4 text-2xl md:text-4xl uppercase font-extralight tracking-widest">
 					trivial space
 				</h1>
 			</header>
 
-			<main class="flex-grow flex-shrink">
+			<main class="w-full h-full">
 				<Routes>
 					<Route path="/:id?" element={<Gallery />} />
 				</Routes>
 			</main>
 
-			<footer class="m-2 md:text-base text-xs md:m-4 fixed bottom-0">
+			<footer class="m-2 md:text-base text-gray-700 text-xs md:m-4 fixed bottom-0">
 				Made with 🖤 by <a href="https://trival.xyz">Thomas Gorny</a>
 			</footer>
 		</div>
