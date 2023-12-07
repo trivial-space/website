@@ -60,28 +60,17 @@ export default function Work(props: Props) {
 					width={props.width}
 					height={props.height}
 				/>
-				<div
-					class="h-full -m-12 box-border pointer-events-none"
+				<img
+					class="w-full h-full opacity-25 border-4 border-b-8 border-slate-800 blur-[25px] pointer-events-none"
+					alt={props.slug}
+					src={props.img}
+					width={props.width}
+					height={props.height}
 					style={{
-						width: 'calc(100% + 6rem)',
-						filter: 'blur(15px)',
+						transform: 'translateY(60vh) scaleY(-1.5)',
+						'transform-origin': 'center 40%',
 					}}
-				>
-					<div
-						class="w-full h-full opacity-30 border-3 border-slate-400"
-						style={{
-							transform: 'translateY(50vh) scale(1, -1.5)',
-							'background-image': 'url(' + props.img + ')',
-							'transform-origin': 'center center',
-							'background-size': 'contain',
-							'background-repeat': 'no-repeat',
-							'background-position': 'center',
-							'mask-image': 'linear-gradient(transparent 20%, white 90%)',
-							'-webkit-mask-image':
-								'linear-gradient(transparent 20%, white 90%)',
-						}}
-					/>
-				</div>
+				/>
 			</A>
 		</div>
 	)

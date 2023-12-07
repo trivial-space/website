@@ -13,5 +13,5 @@ body,
 }
 
 body {
-	@apply bg-gradient-to-b from-teal-50 to-orange-50 via-slate-100;
+	@apply bg-gradient-to-b from-sky-100 to-stone-300 via-slate-50;
 }
