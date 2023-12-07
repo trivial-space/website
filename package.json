@@ -33,6 +33,7 @@
     "@solidjs/router": "^0.9.1",
     "motion": "^10.16.2",
     "serve": "^14.2.0",
+    "solid-heroicons": "^3.2.4",
     "solid-js": "^1.7.6"
   }
 }

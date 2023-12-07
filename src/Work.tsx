@@ -2,6 +2,9 @@ import { A, useParams } from '@solidjs/router'
 import { useState } from './State'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
 import { Motion, Presence } from '@motionone/solid'
+import { Icon } from 'solid-heroicons'
+import { stop, play, arrowPath } from 'solid-heroicons/solid'
+import { tv } from 'solid-heroicons/outline'
 
 interface Props {
 	img: string
@@ -14,7 +17,7 @@ interface Props {
 }
 
 const maxSizeBig = 1000
-const maxSizeWidthFactor = 0.9
+const maxSizeWidthFactor = 0.95
 const maxSizeHeightFactor = 0.8
 
 export default function Work(props: Props) {
@@ -53,7 +56,7 @@ export default function Work(props: Props) {
 			setIsTop(true)
 			timeout = setTimeout(() => {
 				setOpenNav(true)
-			}, 600)
+			}, 700)
 		} else {
 			setPlaying(false)
 			setOpenNav(false)
@@ -88,7 +91,7 @@ export default function Work(props: Props) {
 			<Presence>
 				<Show when={props.active}>
 					<Motion
-						class="fixed inset-0 bg-slate-800 w-full h-full z-40 pointer-events-none "
+						class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800 "
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 0.4 }}
 						exit={{ opacity: 0 }}
@@ -108,12 +111,12 @@ export default function Work(props: Props) {
 				}}
 			>
 				<div
-					class="relative work-link block mx-4 md:mx-8 object-contain my-auto rounded-md shadow-2xl shadow-slate-600/40 transition-filter duration-500 delay-200 ease-in-out origin-center z-50 bg-white"
+					class="work-link transition-filter relative z-50 mx-4 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
 					classList={{ 'blur-[2px] md:blur-[3px]': !props.active }}
 					style={{ width: width() + 'px', height: height() + 'px' }}
 				>
 					<div
-						class="border-[5px] rounded-md border-white w-full h-full "
+						class="h-full w-full rounded-md border-[5px] border-white "
 						classList={{ 'shadow-lg shadow-slate-800/30': openNav() }}
 						style={{ 'background-color': props.background }}
 					>
@@ -122,7 +125,7 @@ export default function Work(props: Props) {
 								when={isPlaying()}
 								fallback={
 									<Motion.div
-										class="w-full h-full"
+										class="h-full w-full"
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
 										exit={{ opacity: 0 }}
@@ -136,7 +139,7 @@ export default function Work(props: Props) {
 											<img
 												alt={props.slug}
 												src={props.img}
-												class="object-contain w-full h-full"
+												class="h-full w-full object-contain"
 												width={props.width}
 												height={props.height}
 											/>
@@ -145,7 +148,7 @@ export default function Work(props: Props) {
 								}
 							>
 								<Motion.div
-									class="w-full h-full overflow-hidden"
+									class="h-full w-full overflow-hidden"
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
@@ -154,7 +157,7 @@ export default function Work(props: Props) {
 									<iframe
 										ref={iframe}
 										src={props.url}
-										class="w-full h-full overflow-hidden"
+										class="h-full w-full overflow-hidden"
 										width={width()}
 										height={height()}
 									/>
@@ -164,30 +167,39 @@ export default function Work(props: Props) {
 					</div>
 
 					<img
-						class="w-full h-full opacity-25 border-4 border-b-8 border-slate-800 blur-[18px] md:blur-[20px] lg:blur-[25px] pointer-events-none -z-10"
+						class="pointer-events-none -z-10 h-full w-full border-4 border-b-8 border-slate-800 opacity-25 blur-[18px] md:blur-[20px] lg:blur-[25px]"
 						alt={props.slug}
 						src={props.img}
 						width={props.width}
 						height={props.height}
 						style={{
-							transform: 'translateY(70vh) scaleY(-1.5)',
+							transform: `translateY(${
+								100 * 0.85 - (window.innerHeight * 13) / window.innerWidth
+							}vh) scaleY(-1.5)`,
 							'transform-origin': 'center 33%',
 						}}
 					/>
 
 					<div
-						class="absolute top-full mx-2 bg-stone-200 shadow-lg shadow-slate-500/25 inset-0 transition-transform duration-700 ease-in-out overflow-y-hidden h-fit rounded-b-lg -z-10"
+						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-200 p-2 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out"
 						classList={{
 							'-translate-y-full': !openNav(),
 							'translate-y-0': openNav(),
 						}}
 					>
-						<nav class="pb-4 pt-4 px-6 flex gap-4">
-							<button onClick={() => togglePlay()}>
-								{isPlaying() ? 'stop' : 'play'}
+						<nav class="flex items-center gap-4 overflow-x-auto px-6 py-1 md:gap-6 md:py-2">
+							<button
+								onClick={() => togglePlay()}
+								title={isPlaying() ? 'stop' : 'play'}
+							>
+								<Icon path={isPlaying() ? stop : play} class="h-6 w-6" />
 							</button>
-							<button onClick={() => refresh()}>reload</button>
-							<a href={props.url}>fullscreen</a>
+							<button onClick={() => refresh()} title="reload">
+								<Icon path={arrowPath} class="h-6 w-6" />
+							</button>
+							<a href={props.url} title="fullscreen">
+								<Icon path={tv} class="h-6 w-6" />
+							</a>
 							<span class="grow" />
 							<h2 class="text-lg font-bold">{props.slug}</h2>
 						</nav>

@@ -80,7 +80,7 @@ export default function Gallery() {
 
 	return (
 		<div
-			class="gallery h-full flex flex-nowrap overflow-x-auto overflow-y-hidden items-center px-[30vw] transition-transform pb-[8vh]"
+			class="gallery flex h-full flex-nowrap items-center overflow-x-auto overflow-y-hidden px-[30vw] pb-[8vh] transition-transform"
 			classList={{ ['!overflow-hidden']: !!workId() && lockScroll() }}
 			ref={galleryEl}
 		>
