@@ -30,13 +30,13 @@ const App: Component = () => {
 
 			<footer class="fixed bottom-0 flex w-full flex-wrap items-center gap-2 p-2 text-xs text-gray-700 md:p-4 md:text-base">
 				<span class="whitespace-nowrap">
-					Made with 🖤 by&nbsp; <a href="https://trival.xyz">Thomas Gorny</a>
+					Made with 🖤 by <a href="https://trival.xyz">Thomas Gorny</a>
 				</span>
 				<span class="flex-grow" />
 				<a href="https://github.com/trivial-space" class="whitespace-nowrap">
 					Open source &nbsp;
 					<svg
-						class="inline-block h-4 w-4 fill-current md:h-6 md:w-6"
+						class="inline-block h-4 w-4 fill-current align-top md:h-5 md:w-5"
 						version="1.1"
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
