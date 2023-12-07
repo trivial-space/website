@@ -61,7 +61,7 @@ export default function Work(props: Props) {
 					height={props.height}
 				/>
 				<img
-					class="w-full h-full opacity-25 border-4 border-b-8 border-slate-800 blur-[25px] pointer-events-none"
+					class="w-full h-full opacity-25 border-4 border-b-8 border-slate-800 blur-[18px] md:blur-[20px] lg:blur-[25px] pointer-events-none"
 					alt={props.slug}
 					src={props.img}
 					width={props.width}
