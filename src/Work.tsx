@@ -72,9 +72,11 @@ export default function Work(props: Props) {
 
 	function togglePlay() {
 		setPlaying(props.active && !isPlaying())
-		if (iframe) {
-			iframe.focus()
-		}
+		requestAnimationFrame(() => {
+			if (iframe) {
+				iframe.focus()
+			}
+		})
 	}
 
 	function refresh() {
@@ -133,8 +135,15 @@ export default function Work(props: Props) {
 									>
 										<A
 											href={`/${props.slug}`}
-											classList={{ 'cursor-default': props.active }}
 											replace
+											onClick={(e) => {
+												if (props.active) {
+													e.preventDefault()
+													if (!isPlaying()) {
+														togglePlay()
+													}
+												}
+											}}
 										>
 											<img
 												alt={props.slug}
