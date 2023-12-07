@@ -67,7 +67,7 @@ export default function Work(props: Props) {
 					width={props.width}
 					height={props.height}
 					style={{
-						transform: 'translateY(66vh) scaleY(-1.5)',
+						transform: 'translateY(62vh) scaleY(-1.5)',
 						'transform-origin': 'center 33%',
 					}}
 				/>
