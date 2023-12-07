@@ -78,7 +78,7 @@ export default function Work(props: Props) {
 							'background-position': 'center',
 							'mask-image': 'linear-gradient(transparent 20%, white 90%)',
 							'-webkit-mask-image':
-								'linear-gradient(transparent 20%, white 90%, white 98%, black 100% )',
+								'linear-gradient(transparent 20%, white 90%)',
 						}}
 					/>
 				</div>
