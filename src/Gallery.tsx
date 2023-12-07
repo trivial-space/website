@@ -21,32 +21,35 @@ export default function Gallery() {
 	const [lockScroll, setLockScroll] = createSignal(false)
 	let lockScrollTimeout: number
 
-	const scrollToSelected = () => {
-		let activeWork = document.querySelector(`[data-id="${workId()}"]`)
-		clearTimeout(lockScrollTimeout)
-		setLockScroll(false)
+	const scrollToSelected =
+		(smooth = true) =>
+		// eslint-disable-next-line solid/reactivity
+		() => {
+			let activeWork = document.querySelector(`[data-id="${workId()}"]`)
+			clearTimeout(lockScrollTimeout)
+			setLockScroll(false)
 
-		if (activeWork && galleryEl) {
-			const bound = activeWork.getBoundingClientRect()
-			const width = state.window.width
-			const leftDelta = width / 2 - bound.left - bound.width / 2
+			if (activeWork && galleryEl) {
+				const bound = activeWork.getBoundingClientRect()
+				const width = state.window.width
+				const leftDelta = width / 2 - bound.left - bound.width / 2
 
-			console.log(bound, leftDelta, width)
+				// console.log(bound, leftDelta, width)
 
-			galleryEl.scrollTo({
-				left: galleryEl.scrollLeft - leftDelta,
-				behavior: 'smooth',
-			})
+				galleryEl.scrollTo({
+					left: galleryEl.scrollLeft - leftDelta,
+					behavior: smooth ? 'smooth' : undefined,
+				})
 
-			lockScrollTimeout = setTimeout(() => {
-				setLockScroll(true)
-			}, 2000)
+				lockScrollTimeout = setTimeout(() => {
+					setLockScroll(true)
+				}, 2000)
+			}
 		}
-	}
 
-	createEffect(scrollToSelected)
+	createEffect(scrollToSelected())
 
-	const initTimeout = setTimeout(scrollToSelected, 1000)
+	const initTimeout = setTimeout(scrollToSelected(false), 600)
 
 	onCleanup(() => {
 		clearTimeout(initTimeout)
@@ -77,7 +80,7 @@ export default function Gallery() {
 
 	return (
 		<div
-			class="h-full flex flex-nowrap overflow-x-auto overflow-y-hidden items-center px-[30vw] transition-transform pb-[8vh]"
+			class="gallery h-full flex flex-nowrap overflow-x-auto overflow-y-hidden items-center px-[30vw] transition-transform pb-[8vh]"
 			classList={{ ['!overflow-hidden']: !!workId() && lockScroll() }}
 			ref={galleryEl}
 		>
@@ -90,6 +93,8 @@ export default function Gallery() {
 							active={sketch.slug === workId()}
 							width={sketch.width}
 							height={sketch.height}
+							url={sketch.href}
+							background={sketch.background}
 						/>
 					)
 				}}
