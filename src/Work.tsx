@@ -49,8 +49,9 @@ export default function Work(props: Props) {
 			<A
 				href={`/${props.slug}`}
 				class="work-link block mx-4 md:mx-8 object-contain bg-white my-auto border-[4px] rounded-md border-white shadow-xl shadow-slate-400 transition-filter duration-500 delay-200 ease-in-out origin-center"
-				classList={{ ['blur-[3px]']: !props.active }}
+				classList={{ ['blur-[2px] md:blur-[3px]']: !props.active }}
 				style={{ width: width() + 'px', height: height() + 'px' }}
+				replace
 			>
 				<img
 					alt={props.slug}
@@ -59,6 +60,28 @@ export default function Work(props: Props) {
 					width={props.width}
 					height={props.height}
 				/>
+				<div
+					class="h-full -m-12 box-border pointer-events-none"
+					style={{
+						width: 'calc(100% + 6rem)',
+						filter: 'blur(15px)',
+					}}
+				>
+					<div
+						class="w-full h-full opacity-30 border-3 border-slate-400"
+						style={{
+							transform: 'translateY(50vh) scale(1, -1.5)',
+							'background-image': 'url(' + props.img + ')',
+							'transform-origin': 'center center',
+							'background-size': 'contain',
+							'background-repeat': 'no-repeat',
+							'background-position': 'center',
+							'mask-image': 'linear-gradient(transparent 20%, white 90%)',
+							'-webkit-mask-image':
+								'linear-gradient(transparent 20%, white 90%, white 98%, black 100% )',
+						}}
+					/>
+				</div>
 			</A>
 		</div>
 	)

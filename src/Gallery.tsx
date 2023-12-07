@@ -18,9 +18,13 @@ export default function Gallery() {
 
 	const workId = createMemo(() => params.id)
 	const state = useState()
+	const [lockScroll, setLockScroll] = createSignal(false)
+	let lockScrollTimeout: number
 
 	const scrollToSelected = () => {
 		let activeWork = document.querySelector(`[data-id="${workId()}"]`)
+		clearTimeout(lockScrollTimeout)
+		setLockScroll(false)
 
 		if (activeWork && galleryEl) {
 			const bound = activeWork.getBoundingClientRect()
@@ -33,10 +37,21 @@ export default function Gallery() {
 				left: galleryEl.scrollLeft - leftDelta,
 				behavior: 'smooth',
 			})
+
+			lockScrollTimeout = setTimeout(() => {
+				setLockScroll(true)
+			}, 2000)
 		}
 	}
 
 	createEffect(scrollToSelected)
+
+	const initTimeout = setTimeout(scrollToSelected, 1000)
+
+	onCleanup(() => {
+		clearTimeout(initTimeout)
+		clearTimeout(lockScrollTimeout)
+	})
 
 	onMount(() => {
 		let works = document.querySelectorAll('.work-link')
@@ -46,8 +61,8 @@ export default function Gallery() {
 				scroll(
 					animate(work, {
 						rotateY: [-25, 25],
-						scale: [1.35, 1.1, 1, 1.1, 1.35],
-						translate: ['20%', '8%', '0%', '-8%', '-20%'],
+						scale: [1.35, 1.15, 1.05, 1, 1.05, 1.15, 1.35],
+						translate: ['20%', '8%', '2%', '0%', '-2%', '-8%', '-20%'],
 					}),
 					{
 						target: work,
@@ -58,18 +73,6 @@ export default function Gallery() {
 				)
 			})
 		}
-	})
-
-	const [lockScroll, setLockScroll] = createSignal(false)
-
-	const timeout2 = setTimeout(scrollToSelected, 1000)
-	const timeout = setTimeout(() => {
-		setLockScroll(true)
-	}, 2000)
-
-	onCleanup(() => {
-		clearTimeout(timeout)
-		clearTimeout(timeout2)
 	})
 
 	return (

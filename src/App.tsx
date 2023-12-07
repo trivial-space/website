@@ -12,7 +12,7 @@ const App: Component = () => {
 					!e.target.classList.contains('work-link') &&
 					!e.target.closest('.work-link')
 				) {
-					navigate('/')
+					navigate('/', { replace: true })
 				}
 			}}
 		>
