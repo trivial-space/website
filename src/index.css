@@ -13,7 +13,7 @@ body,
 }
 
 body {
-	@apply bg-gradient-to-b from-sky-100 via-slate-50 to-stone-300;
+	@apply bg-gradient-to-b from-sky-100 via-slate-50 to-stone-400;
 }
 
 .gallery {

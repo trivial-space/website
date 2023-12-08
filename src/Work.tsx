@@ -196,7 +196,7 @@ export default function Work(props: Props) {
 							'translate-y-0': openNav(),
 						}}
 					>
-						<nav class="flex items-center gap-4 overflow-x-auto px-6 py-1 md:gap-6 md:py-2">
+						<nav class="flex items-center gap-4 overflow-x-auto px-3 py-1 md:gap-6 md:px-6 md:py-2">
 							<button
 								onClick={() => togglePlay()}
 								title={isPlaying() ? 'stop' : 'play'}
