@@ -1,7 +1,7 @@
 import { A, useParams } from '@solidjs/router'
 import { useState } from './State'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
-import { Motion, Presence } from '@motionone/solid'
+import { Motion, Presence } from 'solid-motionone'
 import { Icon } from 'solid-heroicons'
 import { stop, play, arrowPath } from 'solid-heroicons/solid'
 import { tv } from 'solid-heroicons/outline'
@@ -93,7 +93,7 @@ export default function Work(props: Props) {
 			<Presence>
 				<Show when={props.active}>
 					<Motion
-						class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800 "
+						class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 0.4 }}
 						exit={{ opacity: 0 }}
@@ -118,7 +118,7 @@ export default function Work(props: Props) {
 					style={{ width: width() + 'px', height: height() + 'px' }}
 				>
 					<div
-						class="h-full w-full rounded-md border-[5px] border-white "
+						class="h-full w-full rounded-md border-[5px] border-white"
 						classList={{ 'shadow-lg shadow-slate-800/30': openNav() }}
 						style={{ 'background-color': props.background }}
 					>
@@ -190,7 +190,7 @@ export default function Work(props: Props) {
 					/>
 
 					<div
-						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-200 p-2 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out"
+						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-200 py-1 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out"
 						classList={{
 							'-translate-y-full': !openNav(),
 							'translate-y-0': openNav(),

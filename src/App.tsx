@@ -1,8 +1,8 @@
-import type { Component } from 'solid-js'
+import { ParentProps } from 'solid-js'
 import Gallery from './Gallery'
-import { Route, Routes, useNavigate } from '@solidjs/router'
+import { Route, Router, useNavigate } from '@solidjs/router'
 
-const App: Component = () => {
+const Layout = (props: ParentProps) => {
 	const navigate = useNavigate()
 	return (
 		<div
@@ -22,11 +22,7 @@ const App: Component = () => {
 				</h1>
 			</header>
 
-			<main class="h-full w-full">
-				<Routes>
-					<Route path="/:id?" element={<Gallery />} />
-				</Routes>
-			</main>
+			<main class="h-full w-full">{props.children}</main>
 
 			<footer class="fixed bottom-0 flex w-full flex-wrap items-center gap-2 p-2 text-xs text-gray-700 md:p-4 md:text-base">
 				<span class="whitespace-nowrap">
@@ -49,6 +45,14 @@ const App: Component = () => {
 				</a>
 			</footer>
 		</div>
+	)
+}
+
+const App = () => {
+	return (
+		<Router root={Layout}>
+			<Route path="/:id?" component={Gallery} />
+		</Router>
 	)
 }
 
