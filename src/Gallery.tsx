@@ -43,7 +43,7 @@ export default function Gallery() {
 
 				lockScrollTimeout = setTimeout(() => {
 					setLockScroll(true)
-				}, 2000)
+				}, 1000)
 			}
 		}
 
