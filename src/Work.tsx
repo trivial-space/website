@@ -18,9 +18,9 @@ interface Props {
 	background: string
 }
 
-const maxSizeBig = 1000
-const maxSizeWidthFactor = 0.95
-const maxSizeHeightFactor = 0.8
+const maxSizeBig = 1100
+const maxSizeWidthFactor = 0.98
+const maxSizeHeightFactor = 0.85
 
 export default function Work(props: Props) {
 	const state = useState()
@@ -28,22 +28,26 @@ export default function Work(props: Props) {
 
 	const aspectRatio = createMemo(() => props.width / props.height)
 
-	const width = createMemo(() => {
+	const dimensions = createMemo(() => {
 		const maxWidth = Math.min(
 			state.window.width * maxSizeWidthFactor,
 			maxSizeBig,
 		)
+
 		const maxHeight = Math.min(
 			state.window.height * maxSizeHeightFactor,
 			maxSizeBig,
 		)
-		const maxSize = Math.min(maxWidth, maxHeight)
-		return Math.floor(
-			props.width > props.height ? maxSize : maxSize * aspectRatio(),
-		)
-	})
 
-	const height = createMemo(() => Math.floor(width() / aspectRatio()))
+		let height = maxWidth / aspectRatio()
+		let width = maxWidth
+		if (height > maxHeight) {
+			height = maxHeight
+			width = height * aspectRatio()
+		}
+
+		return { width, height }
+	})
 
 	const [openNav, setOpenNav] = createSignal(false)
 	const [isTop, setIsTop] = createSignal(false)
@@ -98,7 +102,7 @@ export default function Work(props: Props) {
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 0.6 }}
 						exit={{ opacity: 0 }}
-						transition={{ duration: 0.6 }}
+						transition={{ duration: 1.6 }}
 					/>
 				</Show>
 			</Presence>
@@ -108,7 +112,7 @@ export default function Work(props: Props) {
 				class="relative -mt-8 transition-transform delay-200 duration-500 ease-in-out"
 				classList={{
 					['scale-[0.66] ']: !isTop(),
-					['scale-100 ']: isTop(),
+					['scale-100 translate-y-[5%]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
 				}}
@@ -119,7 +123,10 @@ export default function Work(props: Props) {
 						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
 						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
 					}}
-					style={{ width: width() + 'px', height: height() + 'px' }}
+					style={{
+						width: dimensions().width + 'px',
+						height: dimensions().height + 'px',
+					}}
 				>
 					<div
 						class="h-full w-full rounded-md border-[5px] border-white"
@@ -155,10 +162,14 @@ export default function Work(props: Props) {
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
-									transition={{ duration: 0.5, delay: props.active ? 0.5 : 0 }}
+									transition={{
+										duration: 0.5,
+										delay: props.active ? 0.5 : 0,
+										endDelay: 0.3,
+									}}
 									src={props.url}
-									width={width()}
-									height={height()}
+									width={dimensions().width}
+									height={dimensions().height}
 									onMouseOver={debouncedFocus}
 								></Motion.iframe>
 							</Show>
