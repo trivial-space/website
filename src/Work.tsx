@@ -3,7 +3,8 @@ import { Icon } from 'solid-heroicons'
 import { tv } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
-import { Motion, Presence } from 'solid-motionone'
+import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
+
 import { useState } from './State'
 
 interface Props {
@@ -88,8 +89,8 @@ export default function Work(props: Props) {
 	return (
 		<>
 			<Presence>
-				<Show when={props.active}>
-					<Motion
+				<Show when={isPlaying()}>
+					<Motion.div
 						class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 0.6 }}
