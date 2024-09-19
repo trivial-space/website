@@ -4,6 +4,7 @@ import { tv } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
 import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
+import { debounce } from 'lodash'
 
 import { useState } from './State'
 
@@ -59,11 +60,6 @@ export default function Work(props: Props) {
 			timeout = setTimeout(() => {
 				setOpenNav(true)
 			}, 400)
-			requestAnimationFrame(() => {
-				if (iframe) {
-					iframe.focus()
-				}
-			})
 		} else {
 			setOpenNav(false)
 			requestAnimationFrame(() => {
@@ -85,6 +81,13 @@ export default function Work(props: Props) {
 			iframe.src = iframe.src
 		}
 	}
+
+	const debouncedFocus = debounce(() => {
+		if (iframe) {
+			iframe.focus()
+			iframe.contentWindow.focus()
+		}
+	}, 100)
 
 	return (
 		<>
@@ -156,6 +159,7 @@ export default function Work(props: Props) {
 									src={props.url}
 									width={width()}
 									height={height()}
+									onMouseOver={debouncedFocus}
 								></Motion.iframe>
 							</Show>
 						</Presence>
@@ -176,18 +180,18 @@ export default function Work(props: Props) {
 					/>
 
 					<div
-						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-200 py-1 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out"
+						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out md:mx-4"
 						classList={{
 							'-translate-y-full': !openNav(),
 							'translate-y-0': openNav(),
 						}}
 					>
-						<nav class="flex items-center gap-4 overflow-x-auto px-3 py-1 md:gap-6 md:px-6 md:py-2">
-							<a href={props.url} title="fullscreen">
-								<Icon path={tv} class="h-6 w-6" />
+						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:p-1 md:px-6">
+							<a href={props.url} title="fullscreen" class="p-1">
+								<Icon path={tv} class="size-5" />
 							</a>
-							<button onClick={() => refresh()} title="reload">
-								<Icon path={arrowPath} class="h-6 w-6" />
+							<button onClick={() => refresh()} title="reload" class="p-1">
+								<Icon path={arrowPath} class="size-5" />
 							</button>
 							<span class="grow" />
 							<h2 class="text-lg font-bold">{props.slug}</h2>

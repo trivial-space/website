@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.14.5",
+    "lodash": "^4.17.21",
     "motion": "^10.16.2",
     "serve": "^14.2.0",
     "solid-heroicons": "^3.2.4",
