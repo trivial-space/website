@@ -41,6 +41,7 @@ export default function Work(props: Props) {
 
 		let height = maxWidth / aspectRatio()
 		let width = maxWidth
+
 		if (height > maxHeight) {
 			height = maxHeight
 			width = height * aspectRatio()
@@ -111,7 +112,7 @@ export default function Work(props: Props) {
 				data-id={props.slug}
 				class="relative -mt-8 transition-transform delay-200 duration-500 ease-in-out"
 				classList={{
-					['scale-[0.66] ']: !isTop(),
+					['scale-[0.66] translate-y-0']: !isTop(),
 					['scale-100 translate-y-[5%]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
@@ -197,7 +198,7 @@ export default function Work(props: Props) {
 							'translate-y-0': openNav(),
 						}}
 					>
-						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:p-1 md:px-6">
+						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:px-6 md:py-1">
 							<a href={props.url} title="fullscreen" class="p-1">
 								<Icon path={tv} class="size-5" />
 							</a>
