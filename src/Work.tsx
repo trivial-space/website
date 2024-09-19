@@ -1,10 +1,12 @@
 import { A, useParams } from '@solidjs/router'
-import { useState } from './State'
-import { createEffect, createMemo, createSignal, Show } from 'solid-js'
-import { Motion, Presence } from 'solid-motionone'
 import { Icon } from 'solid-heroicons'
-import { stop, play, arrowPath } from 'solid-heroicons/solid'
 import { tv } from 'solid-heroicons/outline'
+import { arrowPath } from 'solid-heroicons/solid'
+import { createEffect, createMemo, createSignal, Show } from 'solid-js'
+import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
+import { debounce } from 'lodash'
+
+import { useState } from './State'
 
 interface Props {
 	img: string
@@ -16,9 +18,9 @@ interface Props {
 	background: string
 }
 
-const maxSizeBig = 1000
-const maxSizeWidthFactor = 0.95
-const maxSizeHeightFactor = 0.8
+const maxSizeBig = 1100
+const maxSizeWidthFactor = 0.98
+const maxSizeHeightFactor = 0.85
 
 export default function Work(props: Props) {
 	const state = useState()
@@ -26,26 +28,31 @@ export default function Work(props: Props) {
 
 	const aspectRatio = createMemo(() => props.width / props.height)
 
-	const width = createMemo(() => {
+	const dimensions = createMemo(() => {
 		const maxWidth = Math.min(
 			state.window.width * maxSizeWidthFactor,
 			maxSizeBig,
 		)
+
 		const maxHeight = Math.min(
 			state.window.height * maxSizeHeightFactor,
 			maxSizeBig,
 		)
-		const maxSize = Math.min(maxWidth, maxHeight)
-		return Math.floor(
-			props.width > props.height ? maxSize : maxSize * aspectRatio(),
-		)
-	})
 
-	const height = createMemo(() => Math.floor(width() / aspectRatio()))
+		let height = maxWidth / aspectRatio()
+		let width = maxWidth
+
+		if (height > maxHeight) {
+			height = maxHeight
+			width = height * aspectRatio()
+		}
+
+		return { width, height }
+	})
 
 	const [openNav, setOpenNav] = createSignal(false)
 	const [isTop, setIsTop] = createSignal(false)
-	const [isPlaying, setPlaying] = createSignal(false)
+	const [isPlaying, setIsPlaying] = createSignal(false)
 
 	let iframe: HTMLIFrameElement | null = null
 
@@ -54,50 +61,49 @@ export default function Work(props: Props) {
 		clearTimeout(timeout)
 		if (props.active) {
 			setIsTop(true)
+			setIsPlaying(true)
 			timeout = setTimeout(() => {
 				setOpenNav(true)
-			}, 700)
+			}, 400)
 		} else {
-			setPlaying(false)
 			setOpenNav(false)
+			requestAnimationFrame(() => {
+				setIsPlaying(false)
+			})
 			if (params.id) {
 				setIsTop(false)
 			} else {
 				timeout = setTimeout(() => {
 					setIsTop(false)
-				}, 600)
+				}, 300)
 			}
 		}
 	})
 
-	function togglePlay() {
-		setPlaying(props.active && !isPlaying())
-		requestAnimationFrame(() => {
-			if (iframe) {
-				iframe.focus()
-			}
-		})
-	}
-
 	function refresh() {
-		if (!isPlaying()) {
-			togglePlay()
-		} else if (iframe) {
+		if (props.active && iframe) {
 			// eslint-disable-next-line no-self-assign
 			iframe.src = iframe.src
 		}
 	}
 
+	const debouncedFocus = debounce(() => {
+		if (iframe) {
+			iframe.focus()
+			iframe.contentWindow.focus()
+		}
+	}, 100)
+
 	return (
 		<>
 			<Presence>
-				<Show when={props.active}>
-					<Motion
+				<Show when={isPlaying()}>
+					<Motion.div
 						class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800"
 						initial={{ opacity: 0 }}
-						animate={{ opacity: 0.4 }}
+						animate={{ opacity: 0.6 }}
 						exit={{ opacity: 0 }}
-						transition={{ duration: 0.6 }}
+						transition={{ duration: 1.6 }}
 					/>
 				</Show>
 			</Presence>
@@ -106,16 +112,22 @@ export default function Work(props: Props) {
 				data-id={props.slug}
 				class="relative -mt-8 transition-transform delay-200 duration-500 ease-in-out"
 				classList={{
-					['scale-[0.66] ']: !props.active,
-					['scale-100 ']: props.active,
+					['scale-[0.66] translate-y-0']: !isTop(),
+					['scale-100 translate-y-[5%]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
 				}}
 			>
 				<div
 					class="work-link transition-filter relative z-50 mx-4 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
-					classList={{ 'blur-[2px] md:blur-[3px]': !props.active }}
-					style={{ width: width() + 'px', height: height() + 'px' }}
+					classList={{
+						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
+						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
+					}}
+					style={{
+						width: dimensions().width + 'px',
+						height: dimensions().height + 'px',
+					}}
 				>
 					<div
 						class="h-full w-full rounded-md border-[5px] border-white"
@@ -131,20 +143,9 @@ export default function Work(props: Props) {
 										initial={{ opacity: 0 }}
 										animate={{ opacity: 1 }}
 										exit={{ opacity: 0 }}
-										transition={{ duration: 0.5 }}
+										transition={{ duration: 0.5, endDelay: 0.5 }}
 									>
-										<A
-											href={`/${props.slug}`}
-											replace
-											onClick={(e) => {
-												if (props.active) {
-													e.preventDefault()
-													if (!isPlaying()) {
-														togglePlay()
-													}
-												}
-											}}
-										>
+										<A href={`/${props.slug}`} replace>
 											<img
 												alt={props.slug}
 												src={props.img}
@@ -156,21 +157,22 @@ export default function Work(props: Props) {
 									</Motion.div>
 								}
 							>
-								<Motion.div
+								<Motion.iframe
+									ref={iframe}
 									class="h-full w-full overflow-hidden"
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
-									transition={{ duration: 0.5 }}
-								>
-									<iframe
-										ref={iframe}
-										src={props.url}
-										class="h-full w-full overflow-hidden"
-										width={width()}
-										height={height()}
-									/>
-								</Motion.div>
+									transition={{
+										duration: 0.5,
+										delay: props.active ? 0.5 : 0,
+										endDelay: 0.3,
+									}}
+									src={props.url}
+									width={dimensions().width}
+									height={dimensions().height}
+									onMouseOver={debouncedFocus}
+								></Motion.iframe>
 							</Show>
 						</Presence>
 					</div>
@@ -190,25 +192,19 @@ export default function Work(props: Props) {
 					/>
 
 					<div
-						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-200 py-1 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out"
+						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out md:mx-4"
 						classList={{
 							'-translate-y-full': !openNav(),
 							'translate-y-0': openNav(),
 						}}
 					>
-						<nav class="flex items-center gap-4 overflow-x-auto px-3 py-1 md:gap-6 md:px-6 md:py-2">
-							<button
-								onClick={() => togglePlay()}
-								title={isPlaying() ? 'stop' : 'play'}
-							>
-								<Icon path={isPlaying() ? stop : play} class="h-6 w-6" />
-							</button>
-							<button onClick={() => refresh()} title="reload">
-								<Icon path={arrowPath} class="h-6 w-6" />
-							</button>
-							<a href={props.url} title="fullscreen">
-								<Icon path={tv} class="h-6 w-6" />
+						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:px-6 md:py-1">
+							<a href={props.url} title="fullscreen" class="p-1">
+								<Icon path={tv} class="size-5" />
 							</a>
+							<button onClick={() => refresh()} title="reload" class="p-1">
+								<Icon path={arrowPath} class="size-5" />
+							</button>
 							<span class="grow" />
 							<h2 class="text-lg font-bold">{props.slug}</h2>
 						</nav>

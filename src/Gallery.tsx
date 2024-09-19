@@ -19,6 +19,7 @@ export default function Gallery() {
 	const workId = createMemo(() => params.id)
 	const state = useState()
 	const [lockScroll, setLockScroll] = createSignal(false)
+
 	let lockScrollTimeout: number
 
 	const scrollToSelected =
@@ -43,13 +44,13 @@ export default function Gallery() {
 
 				lockScrollTimeout = setTimeout(() => {
 					setLockScroll(true)
-				}, 2000)
+				}, 1000)
 			}
 		}
 
 	createEffect(scrollToSelected())
 
-	const initTimeout = setTimeout(scrollToSelected(false), 600)
+	const initTimeout = setTimeout(scrollToSelected(false), 700)
 
 	onCleanup(() => {
 		clearTimeout(initTimeout)

@@ -17,10 +17,10 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'colorfields',
 			img: getImageUrl('colorfields'),
-			href: 'https://sketches.trivialspace.net/experiments/paintings/tiles-and-stripes/',
+			href: 'https://sketches.trivialspace.net/experiments/paintings/tile-fields/',
 			allowFullscreen: false,
-			width: 1310,
-			height: 1063,
+			width: 1808,
+			height: 1494,
 			background: 'white',
 		},
 		{
@@ -58,6 +58,15 @@ export const data: { sketches: Sketch[] } = {
 			width: 1558,
 			height: 1555,
 			background: 'white',
+		},
+		{
+			slug: 'homage',
+			img: getImageUrl('homage'),
+			href: 'https://sketches.trivialspace.net/works/homage/',
+			allowFullscreen: true,
+			width: 2309,
+			height: 1535,
+			background: 'black',
 		},
 	],
 }
