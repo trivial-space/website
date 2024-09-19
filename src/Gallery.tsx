@@ -1,3 +1,5 @@
+import { useParams } from '@solidjs/router'
+import { animate, scroll } from 'motion'
 import {
 	For,
 	createEffect,
@@ -6,11 +8,9 @@ import {
 	onCleanup,
 	onMount,
 } from 'solid-js'
-import { useParams } from '@solidjs/router'
+import { useState } from './State'
 import Work from './Work'
 import { data } from './data/data'
-import { animate, scroll } from 'motion'
-import { useState } from './State'
 
 export default function Gallery() {
 	const params = useParams()
@@ -65,8 +65,8 @@ export default function Gallery() {
 				scroll(
 					animate(work, {
 						rotateY: [-25, 25],
-						scale: [1.35, 1.15, 1.05, 1, 1.05, 1.15, 1.35],
-						translate: ['20%', '8%', '2%', '0%', '-2%', '-8%', '-20%'],
+						scale: [1.5, 1.2, 1.05, 1, 1.05, 1.2, 1.5],
+						translate: ['60%', '15%', '2%', '0%', '-2%', '-15%', '-60%'],
 					}),
 					{
 						target: work,

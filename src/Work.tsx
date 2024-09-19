@@ -1,11 +1,10 @@
 import { A, useParams } from '@solidjs/router'
+import { debounce } from 'lodash'
 import { Icon } from 'solid-heroicons'
 import { tv } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
 import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
-import { debounce } from 'lodash'
-
 import { useState } from './State'
 
 interface Props {
@@ -110,16 +109,16 @@ export default function Work(props: Props) {
 			<div
 				style={{ perspective: '1000px' }}
 				data-id={props.slug}
-				class="relative -mt-8 transition-transform delay-200 duration-500 ease-in-out"
+				class="relative -mx-10 -mt-8 transition-transform delay-200 duration-500 ease-in-out md:-mx-20"
 				classList={{
-					['scale-[0.66] translate-y-0']: !isTop(),
+					['scale-[0.60] translate-y-0']: !isTop(),
 					['scale-100 translate-y-[5%]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
 				}}
 			>
 				<div
-					class="work-link transition-filter relative z-50 mx-4 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
+					class="work-link transition-filter relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
 					classList={{
 						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
 						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
@@ -130,9 +129,14 @@ export default function Work(props: Props) {
 					}}
 				>
 					<div
-						class="h-full w-full rounded-md border-[5px] border-white"
-						classList={{ 'shadow-lg shadow-slate-800/30': openNav() }}
-						style={{ 'background-color': props.background }}
+						class="h-full w-full rounded-md border-[4px]"
+						classList={{
+							'shadow-xl shadow-slate-900/35': openNav(),
+						}}
+						style={{
+							'background-color': props.background,
+							'border-color': props.background,
+						}}
 					>
 						<Presence exitBeforeEnter initial={false}>
 							<Show
@@ -187,15 +191,15 @@ export default function Work(props: Props) {
 							transform: `translateY(${
 								100 * 0.85 - (window.innerHeight * 13) / window.innerWidth
 							}vh) scaleY(-1.5)`,
-							'transform-origin': 'center 33%',
+							'transform-origin': 'center 36%',
 						}}
 					/>
 
 					<div
-						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-lg shadow-slate-500/25 transition-transform duration-1000 ease-in-out md:mx-4"
+						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-xl transition-all duration-1000 ease-in-out md:mx-4"
 						classList={{
-							'-translate-y-full': !openNav(),
-							'translate-y-0': openNav(),
+							'-translate-y-full shadow-slate-900/0': !openNav(),
+							'translate-y-0 shadow-slate-900/30': openNav(),
 						}}
 					>
 						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:px-6 md:py-1">
@@ -206,7 +210,7 @@ export default function Work(props: Props) {
 								<Icon path={arrowPath} class="size-5" />
 							</button>
 							<span class="grow" />
-							<h2 class="text-lg font-bold">{props.slug}</h2>
+							<h2 class="font-bold md:text-lg">{props.slug}</h2>
 						</nav>
 					</div>
 				</div>
