@@ -1,7 +1,7 @@
 import { A, useParams } from '@solidjs/router'
 import { debounce } from 'lodash'
 import { Icon } from 'solid-heroicons'
-import { tv } from 'solid-heroicons/outline'
+import { arrowsPointingOut, xMark } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
 import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
@@ -19,7 +19,7 @@ interface Props {
 
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
-const maxSizeHeightFactor = 0.85
+const maxSizeHeightFactor = 0.88
 
 export default function Work(props: Props) {
 	const state = useState()
@@ -38,15 +38,22 @@ export default function Work(props: Props) {
 			maxSizeBig,
 		)
 
-		let height = maxWidth / aspectRatio()
-		let width = maxWidth
+		let height = 0
+		let width = 0
 
-		if (height > maxHeight) {
+		width = maxWidth
+
+		if (width < maxSizeBig && props.active) {
 			height = maxHeight
-			width = height * aspectRatio()
+		} else {
+			height = maxWidth / aspectRatio()
+			if (height > maxHeight) {
+				height = maxHeight
+				width = height * aspectRatio()
+			}
 		}
 
-		return { width, height }
+		return { width: Math.floor(width), height: Math.floor(height) }
 	})
 
 	const [openNav, setOpenNav] = createSignal(false)
@@ -109,7 +116,7 @@ export default function Work(props: Props) {
 			<div
 				style={{ perspective: '1000px' }}
 				data-id={props.slug}
-				class="relative -mx-10 -mt-8 transition-transform delay-200 duration-500 ease-in-out md:-mx-20"
+				class="relative -mx-8 -mt-8 transition-transform delay-200 duration-500 ease-in-out md:-mx-20"
 				classList={{
 					['scale-[0.60] translate-y-0']: !isTop(),
 					['scale-100 translate-y-[5%]']: isTop(),
@@ -118,7 +125,7 @@ export default function Work(props: Props) {
 				}}
 			>
 				<div
-					class="work-link transition-filter relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
+					class="work-link relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
 					classList={{
 						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
 						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
@@ -128,6 +135,9 @@ export default function Work(props: Props) {
 						height: dimensions().height + 'px',
 					}}
 				>
+					<A href="/" class="absolute -top-7 right-0 opacity-50">
+						<Icon path={xMark} class="size-5 text-white" />
+					</A>
 					<div
 						class="h-full w-full rounded-md border-[4px]"
 						classList={{
@@ -203,14 +213,14 @@ export default function Work(props: Props) {
 						}}
 					>
 						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:px-6 md:py-1">
-							<a href={props.url} title="fullscreen" class="p-1">
-								<Icon path={tv} class="size-5" />
-							</a>
+							<h2 class="font-bold md:text-lg">{props.slug}</h2>
+							<span class="grow" />
 							<button onClick={() => refresh()} title="reload" class="p-1">
 								<Icon path={arrowPath} class="size-5" />
 							</button>
-							<span class="grow" />
-							<h2 class="font-bold md:text-lg">{props.slug}</h2>
+							<a href={props.url} title="fullscreen" class="p-1">
+								<Icon path={arrowsPointingOut} class="size-5" />
+							</a>
 						</nav>
 					</div>
 				</div>
