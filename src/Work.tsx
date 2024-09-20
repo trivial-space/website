@@ -135,7 +135,7 @@ export default function Work(props: Props) {
 						height: dimensions().height + 'px',
 					}}
 				>
-					<A href="/" class="absolute -top-7 right-0 opacity-50">
+					<A href="/" class="absolute -top-6 right-0 opacity-50 md:-top-7">
 						<Icon path={xMark} class="size-5 text-white" />
 					</A>
 					<div
