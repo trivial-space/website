@@ -119,7 +119,7 @@ export default function Work(props: Props) {
 				class="relative -mx-8 -mt-8 transition-transform delay-200 duration-500 ease-in-out md:-mx-20"
 				classList={{
 					['scale-[0.60] translate-y-0']: !isTop(),
-					['scale-100 translate-y-[5%]']: isTop(),
+					['scale-100 translate-y-[5vh]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
 				}}
@@ -199,8 +199,8 @@ export default function Work(props: Props) {
 						height={props.height}
 						style={{
 							transform: `translateY(${
-								100 * 0.85 - (window.innerHeight * 13) / window.innerWidth
-							}vh) scaleY(-1.5)`,
+								100 * 0.89 - (window.innerHeight * 14) / window.innerWidth
+							}vh) scaleY(-1.6)`,
 							'transform-origin': 'center 36%',
 						}}
 					/>
