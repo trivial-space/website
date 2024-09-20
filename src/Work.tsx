@@ -19,7 +19,7 @@ interface Props {
 
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
-const maxSizeHeightFactor = 0.88
+const maxSizeHeightFactor = 0.87
 
 export default function Work(props: Props) {
 	const state = useState()
