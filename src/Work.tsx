@@ -25,6 +25,10 @@ export default function Work(props: Props) {
 	const state = useState()
 	const params = useParams()
 
+	const [openNav, setOpenNav] = createSignal(false)
+	const [isTop, setIsTop] = createSignal(false)
+	const [isPlaying, setIsPlaying] = createSignal(false)
+
 	const aspectRatio = createMemo(() => props.width / props.height)
 
 	const dimensions = createMemo(() => {
@@ -43,7 +47,7 @@ export default function Work(props: Props) {
 
 		width = maxWidth
 
-		if (width < maxSizeBig && props.active) {
+		if (width < maxSizeBig && openNav()) {
 			height = maxHeight
 		} else {
 			height = maxWidth / aspectRatio()
@@ -56,10 +60,6 @@ export default function Work(props: Props) {
 		return { width: Math.floor(width), height: Math.floor(height) }
 	})
 
-	const [openNav, setOpenNav] = createSignal(false)
-	const [isTop, setIsTop] = createSignal(false)
-	const [isPlaying, setIsPlaying] = createSignal(false)
-
 	let iframe: HTMLIFrameElement | null = null
 
 	let timeout: number
@@ -70,7 +70,7 @@ export default function Work(props: Props) {
 			setIsPlaying(true)
 			timeout = setTimeout(() => {
 				setOpenNav(true)
-			}, 400)
+			}, 300)
 		} else {
 			setOpenNav(false)
 			requestAnimationFrame(() => {
