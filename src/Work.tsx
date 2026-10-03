@@ -4,7 +4,7 @@ import { Icon } from 'solid-heroicons'
 import { arrowsPointingOut, xMark } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
-import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
+import { Motion, Presence } from 'solid-motionone'
 import { useState } from './State'
 
 interface Props {
@@ -16,6 +16,8 @@ interface Props {
 	url: string
 	background: string
 }
+
+export const browseScale = 0.6
 
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
@@ -31,7 +33,7 @@ export default function Work(props: Props) {
 
 	const aspectRatio = createMemo(() => props.width / props.height)
 
-	const dimensions = createMemo(() => {
+	const size = (open: boolean) => {
 		const maxWidth = Math.min(
 			state.window.width * maxSizeWidthFactor,
 			maxSizeBig,
@@ -47,7 +49,7 @@ export default function Work(props: Props) {
 
 		width = maxWidth
 
-		if (width < maxSizeBig && openNav()) {
+		if (width < maxSizeBig && open) {
 			height = maxHeight
 		} else {
 			height = maxWidth / aspectRatio()
@@ -58,7 +60,13 @@ export default function Work(props: Props) {
 		}
 
 		return { width: Math.floor(width), height: Math.floor(height) }
-	})
+	}
+
+	const dimensions = createMemo(() => size(openNav()))
+
+	// the layout keeps the closed width, so opening never moves the work off
+	// center on the cylinder. the opened work overflows evenly on both sides
+	const layoutWidth = createMemo(() => size(false).width)
 
 	let iframe: HTMLIFrameElement | undefined
 
@@ -114,32 +122,32 @@ export default function Work(props: Props) {
 				</Show>
 			</Presence>
 			<div
-				style={{ perspective: '1000px' }}
 				data-id={props.slug}
-				class="relative -mx-8 -mt-8 transition-transform delay-200 duration-500 ease-in-out md:-mx-20"
+				class="cylinder-panel relative -mx-8 -mt-8 will-change-transform md:-mx-20 md:px-8"
 				classList={{
-					['scale-[0.60] translate-y-0']: !isTop(),
-					['scale-100 translate-y-[5vh]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
 				}}
 			>
 				<div
-					class="work-link relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
+					class="work-link relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out"
 					classList={{
+						'translate-y-[5vh]': isTop(),
 						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
 						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
 					}}
 					style={{
 						width: dimensions().width + 'px',
 						height: dimensions().height + 'px',
+						'margin-inline': (layoutWidth() - dimensions().width) / 2 + 'px',
+						scale: isTop() ? 1 : browseScale,
 					}}
 				>
 					<A href="/" class="absolute -top-6 right-0 opacity-50 md:-top-7">
 						<Icon path={xMark} class="size-5 text-white" />
 					</A>
 					<div
-						class="h-full w-full rounded-md border-[4px]"
+						class="h-full w-full rounded-md border-4"
 						classList={{
 							'shadow-xl shadow-slate-900/35': openNav(),
 						}}

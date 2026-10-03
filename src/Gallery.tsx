@@ -1,5 +1,4 @@
 import { useParams } from '@solidjs/router'
-import { animate, scroll } from 'motion'
 import {
 	For,
 	createEffect,
@@ -8,13 +7,30 @@ import {
 	onCleanup,
 	onMount,
 } from 'solid-js'
+import {
+	Cylinder,
+	createCylinder,
+	cylinderTransform,
+	panelRange,
+} from './cylinder'
 import { useState } from './State'
-import Work from './Work'
+import Work, { browseScale } from './Work'
 import { data } from './data/data'
+
+// offset of the first / last work from the center at the scroll ends,
+// as fraction of half the viewport width (1 = at the screen edge)
+const endWorkOffset = 0.3
+
+// works are posed by a css scroll-driven animation (.cylinder-panel in index.css),
+// configured through css variables, so resizing never restarts it.
+// without support (firefox), they are posed on scroll instead
+const nativeScrollTimeline = CSS.supports('animation-timeline: view()')
 
 export default function Gallery() {
 	const params = useParams()
 	let galleryEl!: HTMLDivElement
+	let startSpacer!: HTMLDivElement
+	let endSpacer!: HTMLDivElement
 
 	const workId = createMemo(() => params.id)
 	const state = useState()
@@ -26,19 +42,18 @@ export default function Gallery() {
 		(smooth = true) =>
 		// eslint-disable-next-line solid/reactivity
 		() => {
-			let activeWork = document.querySelector(`[data-id="${workId()}"]`)
+			let activeWork = galleryEl?.querySelector<HTMLElement>(
+				`[data-id="${workId()}"]`,
+			)
 			clearTimeout(lockScrollTimeout)
 			setLockScroll(false)
 
 			if (activeWork && galleryEl) {
-				const bound = activeWork.getBoundingClientRect()
-				const width = state.window.width
-				const leftDelta = width / 2 - bound.left - bound.width / 2
-
-				// console.log(bound, leftDelta, width)
+				// layout position, the bounding rect includes the cylinder projection
+				const center = activeWork.offsetLeft + activeWork.offsetWidth / 2
 
 				galleryEl.scrollTo({
-					left: galleryEl.scrollLeft - leftDelta,
+					left: center - state.window.width / 2,
 					behavior: smooth ? 'smooth' : undefined,
 				})
 
@@ -58,39 +73,85 @@ export default function Gallery() {
 	})
 
 	onMount(() => {
-		let works = document.querySelectorAll('.work-link')
+		let cylinder: Cylinder | undefined
+		let panels: { el: HTMLElement; center: number; exit: number }[] = []
 
-		if (typeof (window as any).ScrollTimeline !== 'undefined') {
-			// single transform keyframes, so motion uses an accelerated WAAPI animation.
-			// independent transforms (rotateY, scale) run per frame via inline styles,
-			// which the css transition on .work-link delays until scrolling stops
-			const scales = [1.5, 1.2, 1.05, 1, 1.05, 1.2, 1.5]
-			const translates = ['60%', '15%', '2%', '0%', '-2%', '-15%', '-60%']
-			const transform = scales.map((s, i) => {
-				const rotate = -25 + (50 * i) / (scales.length - 1)
-				return `translateX(${translates[i]}) scale(${s}) rotateY(${rotate}deg)`
+		const update = () => {
+			const works = [...galleryEl.querySelectorAll<HTMLElement>('[data-id]')]
+			const viewWidth = galleryEl.clientWidth
+			if (!works.length || !viewWidth) return
+
+			// at the scroll ends, the first / last work rests off center, slightly
+			// rotated, hinting the scroll direction. every work can still be centered
+			const first = works[0]
+			const last = works[works.length - 1]
+			const firstMargin = parseFloat(getComputedStyle(first).marginLeft)
+			const lastMargin = parseFloat(getComputedStyle(last).marginRight)
+			// spacers instead of padding, which would widen the gallery itself
+			// while the works are not yet sized
+			const endOffset = (endWorkOffset * viewWidth) / 2
+			startSpacer.style.width = `${Math.max(0, viewWidth / 2 + endOffset - first.offsetWidth / 2 - firstMargin)}px`
+			endSpacer.style.width = `${Math.max(0, viewWidth / 2 + endOffset - last.offsetWidth / 2 - lastMargin)}px`
+
+			const visualWidth = (work: HTMLElement) =>
+				work.querySelector<HTMLElement>('.work-link')!.offsetWidth * browseScale
+
+			const c = createCylinder(
+				viewWidth,
+				galleryEl.clientHeight,
+				Math.max(...works.map(visualWidth)),
+			)
+			cylinder = c
+
+			panels = works.map((el) => {
+				const { exit, travel } = panelRange(c, visualWidth(el), el.offsetWidth)
+				if (nativeScrollTimeline) {
+					// hold the poses outside the visible range, in percent of the 'cover' range
+					const rangeStart = 50 - (50 * exit) / travel
+					el.style.setProperty('--cylinder-from', cylinderTransform(c, exit))
+					el.style.setProperty('--cylinder-to', cylinderTransform(c, -exit))
+					el.style.setProperty('--cylinder-range-start', `${rangeStart}%`)
+					el.style.setProperty('--cylinder-range-end', `${100 - rangeStart}%`)
+				}
+				return { el, center: el.offsetLeft + el.offsetWidth / 2, exit }
 			})
 
-			works.forEach((work) => {
-				scroll(
-					animate(work, { transform }),
-					{
-						target: work,
-						container: galleryEl,
-						axis: 'x',
-						offset: ['start end', 'end start'],
-					},
-				)
-			})
+			if (!nativeScrollTimeline) pose()
 		}
+
+		const pose = () => {
+			if (!cylinder) return
+			const viewCenter = galleryEl.scrollLeft + galleryEl.clientWidth / 2
+			for (const { el, center, exit } of panels) {
+				const s = Math.max(-exit, Math.min(exit, center - viewCenter))
+				el.style.transform = cylinderTransform(cylinder, s)
+			}
+		}
+
+		// runs after layout, before paint, so poses never lag behind a resize
+		const observer = new ResizeObserver(update)
+		observer.observe(galleryEl, { box: 'border-box' })
+		galleryEl
+			.querySelectorAll('[data-id]')
+			.forEach((work) => observer.observe(work))
+
+		if (!nativeScrollTimeline) {
+			galleryEl.addEventListener('scroll', pose, { passive: true })
+		}
+
+		onCleanup(() => {
+			observer.disconnect()
+			galleryEl.removeEventListener('scroll', pose)
+		})
 	})
 
 	return (
 		<div
-			class="gallery flex h-full flex-nowrap items-center overflow-x-auto overflow-y-hidden px-[30vw] pb-[8vh] transition-transform"
+			class="gallery relative flex h-full flex-nowrap items-center overflow-x-auto overflow-y-hidden pb-[8vh] transition-transform"
 			classList={{ ['overflow-hidden!']: !!workId() && lockScroll() }}
 			ref={galleryEl}
 		>
+			<div class="h-px shrink-0" ref={startSpacer} />
 			<For each={data.sketches}>
 				{(sketch) => {
 					return (
@@ -106,6 +167,7 @@ export default function Gallery() {
 					)
 				}}
 			</For>
+			<div class="h-px shrink-0" ref={endSpacer} />
 		</div>
 	)
 }
