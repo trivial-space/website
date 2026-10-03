@@ -13,9 +13,9 @@ import {
 	cylinderTransform,
 	panelRange,
 } from './cylinder'
+import { data } from './data/data'
 import { useState } from './State'
 import Work, { browseScale } from './Work'
-import { data } from './data/data'
 
 // offset of the first / last work from the center at the scroll ends,
 // as fraction of half the viewport width (1 = at the screen edge)
@@ -40,7 +40,6 @@ export default function Gallery() {
 
 	const scrollToSelected =
 		(smooth = true) =>
-		// eslint-disable-next-line solid/reactivity
 		() => {
 			let activeWork = galleryEl?.querySelector<HTMLElement>(
 				`[data-id="${workId()}"]`,
@@ -83,15 +82,12 @@ export default function Gallery() {
 
 			// at the scroll ends, the first / last work rests off center, slightly
 			// rotated, hinting the scroll direction. every work can still be centered
-			const first = works[0]
-			const last = works[works.length - 1]
-			const firstMargin = parseFloat(getComputedStyle(first).marginLeft)
-			const lastMargin = parseFloat(getComputedStyle(last).marginRight)
 			// spacers instead of padding, which would widen the gallery itself
 			// while the works are not yet sized
-			const endOffset = (endWorkOffset * viewWidth) / 2
-			startSpacer.style.width = `${Math.max(0, viewWidth / 2 + endOffset - first.offsetWidth / 2 - firstMargin)}px`
-			endSpacer.style.width = `${Math.max(0, viewWidth / 2 + endOffset - last.offsetWidth / 2 - lastMargin)}px`
+			const endSpace = (work: HTMLElement) =>
+				`${Math.max(0, ((1 + endWorkOffset) * viewWidth) / 2 - work.offsetWidth / 2)}px`
+			startSpacer.style.width = endSpace(works[0])
+			endSpacer.style.width = endSpace(works[works.length - 1])
 
 			const visualWidth = (work: HTMLElement) =>
 				work.querySelector<HTMLElement>('.work-link')!.offsetWidth * browseScale

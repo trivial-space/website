@@ -18,6 +18,8 @@ interface Props {
 }
 
 export const browseScale = 0.6
+// gap between works, relative to the browsing size of the smaller max dimension
+const gapFactor = 0.7
 
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
@@ -33,16 +35,13 @@ export default function Work(props: Props) {
 
 	const aspectRatio = createMemo(() => props.width / props.height)
 
-	const size = (open: boolean) => {
-		const maxWidth = Math.min(
-			state.window.width * maxSizeWidthFactor,
-			maxSizeBig,
-		)
+	const maxSize = createMemo(() => ({
+		width: Math.min(state.window.width * maxSizeWidthFactor, maxSizeBig),
+		height: Math.min(state.window.height * maxSizeHeightFactor, maxSizeBig),
+	}))
 
-		const maxHeight = Math.min(
-			state.window.height * maxSizeHeightFactor,
-			maxSizeBig,
-		)
+	const size = (open: boolean) => {
+		const { width: maxWidth, height: maxHeight } = maxSize()
 
 		let height = 0
 		let width = 0
@@ -64,9 +63,14 @@ export default function Work(props: Props) {
 
 	const dimensions = createMemo(() => size(openNav()))
 
-	// the layout keeps the closed width, so opening never moves the work off
-	// center on the cylinder. the opened work overflows evenly on both sides
-	const layoutWidth = createMemo(() => size(false).width)
+	// the layout slot is the browsing size plus a gap scaled with the gallery,
+	// so the spacing keeps its proportion on every screen. it never changes when
+	// opening, so the work stays centered on the cylinder and overflows evenly
+	const slotWidth = createMemo(() => {
+		const { width, height } = maxSize()
+		const gap = gapFactor * browseScale * Math.min(width, height)
+		return browseScale * size(false).width + gap
+	})
 
 	let iframe: HTMLIFrameElement | undefined
 
@@ -123,7 +127,7 @@ export default function Work(props: Props) {
 			</Presence>
 			<div
 				data-id={props.slug}
-				class="cylinder-panel relative -mx-8 -mt-8 will-change-transform md:-mx-20 md:px-8"
+				class="cylinder-panel relative -mt-8 will-change-transform"
 				classList={{
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
@@ -139,7 +143,7 @@ export default function Work(props: Props) {
 					style={{
 						width: dimensions().width + 'px',
 						height: dimensions().height + 'px',
-						'margin-inline': (layoutWidth() - dimensions().width) / 2 + 'px',
+						'margin-inline': (slotWidth() - dimensions().width) / 2 + 'px',
 						scale: isTop() ? 1 : browseScale,
 					}}
 				>

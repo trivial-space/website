@@ -5,25 +5,20 @@
 
 const deg = Math.PI / 180
 
-// rotation of a work whose center reaches the screen edge, on a square viewport
-const edgeAngle = 40 * deg
-// how strongly the edge rotation shrinks on wider landscape viewports
-const landscapeFalloff = 0.7
-// how strongly the edge rotation shrinks on narrower portrait viewports
-const portraitFalloff = 0.6
-// cylinder radius / viewer distance. 1: viewer at the center, > 1: viewer in
-// front of the center, flatter. < 1: viewer behind the center, more curved
-const radiusFactor = 1
+// rotation of a work whose center reaches the screen edge,
+// on square and portrait viewports
+const edgeAngle = 27 * deg
+// how strongly the edge rotation grows on wider landscape viewports.
+// 0.5: the radius scales with sqrt(width * height) instead of the width
+const landscapeGrowth = 0.5
 
 export interface Cylinder {
 	radius: number
-	distance: number
 	viewWidth: number
 }
 
 function cylinder(viewWidth: number, angle: number): Cylinder {
-	const radius = viewWidth / (2 * angle)
-	return { radius, distance: radius / radiusFactor, viewWidth }
+	return { radius: viewWidth / (2 * angle), viewWidth }
 }
 
 export function createCylinder(
@@ -32,8 +27,7 @@ export function createCylinder(
 	maxPanelWidth: number,
 ): Cylinder {
 	const aspect = viewWidth / viewHeight
-	let angle =
-		edgeAngle * aspect ** (aspect > 1 ? -landscapeFalloff : portraitFalloff)
+	let angle = edgeAngle * Math.max(aspect, 1) ** landscapeGrowth
 
 	// widen the cylinder until even the widest work leaves the screen
 	// before it reaches behind the viewer
@@ -45,16 +39,12 @@ export function createCylinder(
 	return cylinder(viewWidth, angle)
 }
 
-// Top view, viewer at the origin looking along +y, front work at depth `distance`.
+// Top view, viewer at the origin (the cylinder axis) looking along +y.
 // Returns a point on a work rotated by `angle`, `offset` along the work from its center.
 function point(c: Cylinder, angle: number, offset: number) {
 	return {
 		x: c.radius * Math.sin(angle) + offset * Math.cos(angle),
-		y:
-			c.distance -
-			c.radius +
-			c.radius * Math.cos(angle) -
-			offset * Math.sin(angle),
+		y: c.radius * Math.cos(angle) - offset * Math.sin(angle),
 	}
 }
 
@@ -64,7 +54,7 @@ function exitAngle(c: Cylinder, panelWidth: number): number | null {
 	const half = panelWidth / 2
 	const outside = (angle: number) => {
 		const near = point(c, angle, -half)
-		return c.distance * near.x - (c.viewWidth / 2) * near.y >= 0
+		return c.radius * near.x - (c.viewWidth / 2) * near.y >= 0
 	}
 
 	let lo = 0
@@ -77,14 +67,15 @@ function exitAngle(c: Cylinder, panelWidth: number): number | null {
 	}
 
 	const far = point(c, hi, half)
-	return far.y > c.distance * 0.05 ? hi : null
+	return far.y > c.radius * 0.05 ? hi : null
 }
 
 // Pose of a work at layout offset `s` from the viewport center: cancel the flat
-// offset, rotate around the cylinder axis, project from the viewer.
+// offset, rotate around the cylinder axis, project from the viewer on that axis.
 // Offset and angle are linear in `s`, so linear interpolation between two poses is exact.
 export function cylinderTransform(c: Cylinder, s: number) {
-	return `translateX(${-s}px) perspective(${c.distance}px) translateZ(${c.radius}px) rotateY(${-s / c.radius}rad) translateZ(${-c.radius}px)`
+	const r = c.radius
+	return `translateX(${-s}px) perspective(${r}px) translateZ(${r}px) rotateY(${-s / r}rad) translateZ(${-r}px)`
 }
 
 // The offset range where a work is visible. Beyond it, the pose should be held
