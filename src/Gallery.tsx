@@ -21,10 +21,11 @@ import Work, { browseScale } from './Work'
 // as fraction of half the viewport width (1 = at the screen edge)
 const endWorkOffset = 0.3
 
-// works are posed by a css scroll-driven animation (.cylinder-panel in index.css),
-// configured through css variables, so resizing never restarts it.
-// without support (firefox), they are posed on scroll instead
-const nativeScrollTimeline = CSS.supports('animation-timeline: view()')
+// works are posed by scroll-driven animations on a ViewTimeline. on resize their
+// keyframes are updated in place, so they never restart. keyframes are plain
+// values, so browsers can run them off the main thread.
+// without support (firefox), works are posed on scroll instead
+const nativeScrollTimeline = typeof ViewTimeline !== 'undefined'
 
 export default function Gallery() {
 	const params = useParams()
@@ -74,6 +75,7 @@ export default function Gallery() {
 	onMount(() => {
 		let cylinder: Cylinder | undefined
 		let panels: { el: HTMLElement; center: number; exit: number }[] = []
+		const animations = new Map<HTMLElement, Animation>()
 
 		const update = () => {
 			const works = [...galleryEl.querySelectorAll<HTMLElement>('[data-id]')]
@@ -102,12 +104,30 @@ export default function Gallery() {
 			panels = works.map((el) => {
 				const { exit, travel } = panelRange(c, visualWidth(el), el.offsetWidth)
 				if (nativeScrollTimeline) {
-					// hold the poses outside the visible range, in percent of the 'cover' range
-					const rangeStart = 50 - (50 * exit) / travel
-					el.style.setProperty('--cylinder-from', cylinderTransform(c, exit))
-					el.style.setProperty('--cylinder-to', cylinderTransform(c, -exit))
-					el.style.setProperty('--cylinder-range-start', `${rangeStart}%`)
-					el.style.setProperty('--cylinder-range-end', `${100 - rangeStart}%`)
+					// hold the poses outside the visible range. offsets are progress
+					// through the 'cover' range, from entering to leaving the viewport
+					const visibleFrom = 0.5 - (0.5 * exit) / travel
+					const enter = cylinderTransform(c, exit)
+					const leave = cylinderTransform(c, -exit)
+					const keyframes = [
+						{ transform: enter, offset: 0 },
+						{ transform: enter, offset: visibleFrom },
+						{ transform: leave, offset: 1 - visibleFrom },
+						{ transform: leave, offset: 1 },
+					]
+					const animation = animations.get(el)
+					if (animation) {
+						;(animation.effect as KeyframeEffect).setKeyframes(keyframes)
+					} else {
+						animations.set(
+							el,
+							el.animate(keyframes, {
+								fill: 'both',
+								easing: 'linear',
+								timeline: new ViewTimeline({ subject: el, axis: 'inline' }),
+							}),
+						)
+					}
 				}
 				return { el, center: el.offsetLeft + el.offsetWidth / 2, exit }
 			})
@@ -138,6 +158,7 @@ export default function Gallery() {
 		onCleanup(() => {
 			observer.disconnect()
 			galleryEl.removeEventListener('scroll', pose)
+			animations.forEach((animation) => animation.cancel())
 		})
 	})
 
@@ -147,23 +168,26 @@ export default function Gallery() {
 			classList={{ ['overflow-hidden!']: !!workId() && lockScroll() }}
 			ref={galleryEl}
 		>
-			<div class="h-px shrink-0" ref={startSpacer} />
-			<For each={data.sketches}>
-				{(sketch) => {
-					return (
-						<Work
-							img={sketch.img}
-							slug={sketch.slug}
-							active={sketch.slug === workId()}
-							width={sketch.width}
-							height={sketch.height}
-							url={sketch.href}
-							background={sketch.background}
-						/>
-					)
-				}}
-			</For>
-			<div class="h-px shrink-0" ref={endSpacer} />
+			{/* clips horizontally, so the projected works never extend the scroll range */}
+			<div class="flex shrink-0 items-center self-stretch overflow-x-clip">
+				<div class="h-px shrink-0" ref={startSpacer} />
+				<For each={data.sketches}>
+					{(sketch) => {
+						return (
+							<Work
+								img={sketch.img}
+								slug={sketch.slug}
+								active={sketch.slug === workId()}
+								width={sketch.width}
+								height={sketch.height}
+								url={sketch.href}
+								background={sketch.background}
+							/>
+						)
+					}}
+				</For>
+				<div class="h-px shrink-0" ref={endSpacer} />
+			</div>
 		</div>
 	)
 }

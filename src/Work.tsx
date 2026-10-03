@@ -22,7 +22,8 @@ export const browseScale = 0.6
 const gapFactor = 0.7
 
 // room around the reflection for its blur, 3x the largest blur radius
-const reflectionPad = 75
+const reflectionPad = 90
+const reflectionMask = 'linear-gradient(to top, black, transparent 80%)'
 
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
@@ -131,7 +132,7 @@ export default function Work(props: Props) {
 			</Show>
 			<div
 				data-id={props.slug}
-				class="cylinder-panel relative -mt-8 will-change-transform"
+				class="relative -mt-8 will-change-transform"
 				classList={{
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
@@ -201,9 +202,10 @@ export default function Work(props: Props) {
 
 					{/* reflection on the ground. the mask fades it out away from the work
 					    (before the flip, so towards the top). the padding keeps the blur
-					    inside the masked area, which would otherwise clip it */}
+					    inside the masked area, which would otherwise clip it. blur and mask
+					    on the same element, safari ignores masks over filtered children */}
 					<div
-						class="pointer-events-none -z-10"
+						class="pointer-events-none -z-10 blur-[20px] md:blur-[24px] lg:blur-[30px]"
 						style={{
 							margin: `-${reflectionPad}px`,
 							padding: `${reflectionPad}px`,
@@ -213,11 +215,12 @@ export default function Work(props: Props) {
 								100 * 0.89 - (window.innerHeight * 14) / window.innerWidth
 							}vh) scaleY(-1.6)`,
 							'transform-origin': `center calc(${reflectionPad}px + (100% - ${2 * reflectionPad}px) * 0.36)`,
-							'mask-image': 'linear-gradient(to top, black, transparent 80%)',
+							'mask-image': reflectionMask,
+							'-webkit-mask-image': reflectionMask,
 						}}
 					>
 						<img
-							class="h-full w-full border-4 border-b-8 border-slate-800 opacity-25 blur-[20px] md:blur-[24px] lg:blur-[30px]"
+							class="h-full w-full border-4 border-b-8 border-slate-800 opacity-25"
 							alt={props.slug}
 							src={props.img}
 							width={props.width}

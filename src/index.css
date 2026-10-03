@@ -37,25 +37,3 @@ body {
 		opacity: 1;
 	}
 }
-
-/* poses of the works on the cylinder, configured from Gallery.tsx */
-@keyframes cylinder {
-	from {
-		transform: var(--cylinder-from);
-	}
-	to {
-		transform: var(--cylinder-to);
-	}
-}
-
-@supports (animation-timeline: view()) {
-	.cylinder-panel {
-		/* longhands, the minifier would merge the timeline into an invalid shorthand */
-		animation-name: cylinder;
-		animation-timing-function: linear;
-		animation-fill-mode: both;
-		animation-timeline: view(inline);
-		animation-range: cover var(--cylinder-range-start, 0%) cover
-			var(--cylinder-range-end, 100%);
-	}
-}
