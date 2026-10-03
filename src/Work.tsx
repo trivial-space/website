@@ -21,10 +21,6 @@ export const browseScale = 0.6
 // gap between works, relative to the browsing size of the smaller max dimension
 const gapFactor = 0.7
 
-// room around the reflection for its blur, 3x the largest blur radius
-const reflectionPad = 90
-const reflectionMask = 'linear-gradient(to top, black, transparent 80%)'
-
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
 const maxSizeHeightFactor = 0.87
@@ -200,33 +196,19 @@ export default function Work(props: Props) {
 						</Show>
 					</div>
 
-					{/* reflection on the ground. the mask fades it out away from the work
-					    (before the flip, so towards the top). the padding keeps the blur
-					    inside the masked area, which would otherwise clip it. blur and mask
-					    on the same element, safari ignores masks over filtered children */}
-					<div
-						class="pointer-events-none -z-10 blur-[20px] md:blur-[24px] lg:blur-[30px]"
+					<img
+						class="pointer-events-none -z-10 h-full w-full border-4 border-b-8 border-slate-800 opacity-25 blur-[20px] md:blur-[24px] lg:blur-[30px]"
+						alt={props.slug}
+						src={props.img}
+						width={props.width}
+						height={props.height}
 						style={{
-							margin: `-${reflectionPad}px`,
-							padding: `${reflectionPad}px`,
-							width: `calc(100% + ${2 * reflectionPad}px)`,
-							height: `calc(100% + ${2 * reflectionPad}px)`,
 							transform: `translateY(${
 								100 * 0.89 - (window.innerHeight * 14) / window.innerWidth
 							}vh) scaleY(-1.6)`,
-							'transform-origin': `center calc(${reflectionPad}px + (100% - ${2 * reflectionPad}px) * 0.36)`,
-							'mask-image': reflectionMask,
-							'-webkit-mask-image': reflectionMask,
+							'transform-origin': 'center 36%',
 						}}
-					>
-						<img
-							class="h-full w-full border-4 border-b-8 border-slate-800 opacity-25"
-							alt={props.slug}
-							src={props.img}
-							width={props.width}
-							height={props.height}
-						/>
-					</div>
+					/>
 
 					<div
 						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-xl transition-all duration-1000 ease-in-out md:mx-4"
