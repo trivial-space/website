@@ -20,7 +20,6 @@
     "eslint-plugin-solid": "^0.18.0",
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "solid-devtools": "^0.34.5",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
@@ -32,10 +31,5 @@
     "lodash": "^4.18.1",
     "solid-heroicons": "^3.2.4",
     "solid-js": "^1.9.15"
-  },
-  "overrides": {
-    "solid-devtools": {
-      "vite": "$vite"
-    }
   }
 }
