@@ -3,7 +3,15 @@ import { debounce } from 'lodash'
 import { Icon } from 'solid-heroicons'
 import { arrowsPointingOut, xMark } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
-import { createEffect, createMemo, createSignal, Show } from 'solid-js'
+import {
+	createEffect,
+	createMemo,
+	createSignal,
+	onCleanup,
+	onMount,
+	Show,
+} from 'solid-js'
+import { createReflection } from './reflection'
 import { useState } from './State'
 import { createPresence } from './utils'
 
@@ -70,6 +78,18 @@ export default function Work(props: Props) {
 		const { width, height } = maxSize()
 		const gap = gapFactor * browseScale * Math.min(width, height)
 		return browseScale * size(false).width + gap
+	})
+
+	const [reflection, setReflection] = createSignal<string>()
+	onMount(() => {
+		createReflection(props.img, props.background).then(
+			setReflection,
+			console.error,
+		)
+	})
+	onCleanup(() => {
+		const url = reflection()
+		if (url) URL.revokeObjectURL(url)
 	})
 
 	const overlay = createPresence(isPlaying, 1600)
@@ -196,19 +216,23 @@ export default function Work(props: Props) {
 						</Show>
 					</div>
 
-					<img
-						class="pointer-events-none -z-10 h-full w-full border-4 border-b-8 border-slate-800 opacity-25 blur-[20px] md:blur-[24px] lg:blur-[30px]"
-						alt={props.slug}
-						src={props.img}
-						width={props.width}
-						height={props.height}
-						style={{
-							transform: `translateY(${
-								100 * 0.89 - (window.innerHeight * 14) / window.innerWidth
-							}vh) scaleY(-1.6)`,
-							'transform-origin': 'center 36%',
-						}}
-					/>
+					<Show when={reflection()}>
+						{(src) => (
+							<img
+								class="pointer-events-none -z-10 h-full w-full opacity-25 blur-[20px] transition-opacity duration-1000 md:blur-[24px] lg:blur-[30px] starting:opacity-0"
+								alt=""
+								src={src()}
+								width={props.width}
+								height={props.height}
+								style={{
+									transform: `translateY(${
+										100 * 0.89 - (state.window.height * 14) / state.window.width
+									}vh) scaleY(-1.5)`,
+									'transform-origin': 'center 35%',
+								}}
+							/>
+						)}
+					</Show>
 
 					<div
 						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-xl transition-all duration-1000 ease-in-out md:mx-4"
