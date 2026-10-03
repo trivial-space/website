@@ -61,13 +61,19 @@ export default function Gallery() {
 		let works = document.querySelectorAll('.work-link')
 
 		if (typeof (window as any).ScrollTimeline !== 'undefined') {
+			// single transform keyframes, so motion uses an accelerated WAAPI animation.
+			// independent transforms (rotateY, scale) run per frame via inline styles,
+			// which the css transition on .work-link delays until scrolling stops
+			const scales = [1.5, 1.2, 1.05, 1, 1.05, 1.2, 1.5]
+			const translates = ['60%', '15%', '2%', '0%', '-2%', '-15%', '-60%']
+			const transform = scales.map((s, i) => {
+				const rotate = -25 + (50 * i) / (scales.length - 1)
+				return `translateX(${translates[i]}) scale(${s}) rotateY(${rotate}deg)`
+			})
+
 			works.forEach((work) => {
 				scroll(
-					animate(work, {
-						rotateY: [-25, 25],
-						scale: [1.5, 1.2, 1.05, 1, 1.05, 1.2, 1.5],
-						translate: ['60%', '15%', '2%', '0%', '-2%', '-15%', '-60%'],
-					}),
+					animate(work, { transform }),
 					{
 						target: work,
 						container: galleryEl,

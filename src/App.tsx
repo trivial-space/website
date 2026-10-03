@@ -1,6 +1,6 @@
+import { Route, Router, useNavigate } from '@solidjs/router'
 import { ParentProps } from 'solid-js'
 import Gallery from './Gallery'
-import { Route, Router, useNavigate } from '@solidjs/router'
 
 const Layout = (props: ParentProps) => {
 	const navigate = useNavigate()
@@ -33,7 +33,6 @@ const Layout = (props: ParentProps) => {
 					Open source &nbsp;
 					<svg
 						class="inline-block h-4 w-4 fill-current align-top md:h-5 md:w-5"
-						version="1.1"
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
 						height="16"

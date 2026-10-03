@@ -19,7 +19,7 @@ body,
 }
 
 body {
-	@apply bg-linear-to-b from-sky-100 via-slate-50 to-stone-400;
+	@apply bg-linear-to-b from-cyan-600/15 via-slate-50 to-fuchsia-800/30;
 }
 
 .gallery {
