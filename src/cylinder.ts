@@ -7,7 +7,7 @@ const deg = Math.PI / 180
 
 // rotation of a work whose center reaches the screen edge,
 // on square and portrait viewports
-const edgeAngle = 27 * deg
+const edgeAngle = 26 * deg
 // how strongly the edge rotation grows on wider landscape viewports.
 // 0.5: the radius scales with sqrt(width * height) instead of the width
 const landscapeGrowth = 0.5
