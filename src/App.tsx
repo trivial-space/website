@@ -1,6 +1,6 @@
+import { Route, Router, useNavigate } from '@solidjs/router'
 import { ParentProps } from 'solid-js'
 import Gallery from './Gallery'
-import { Route, Router, useNavigate } from '@solidjs/router'
 
 const Layout = (props: ParentProps) => {
 	const navigate = useNavigate()
@@ -28,12 +28,11 @@ const Layout = (props: ParentProps) => {
 				<span class="whitespace-nowrap">
 					Made with 🖤 by <a href="https://trival.xyz">Thomas Gorny</a>
 				</span>
-				<span class="flex-grow" />
+				<span class="grow" />
 				<a href="https://github.com/trivial-space" class="whitespace-nowrap">
 					Open source &nbsp;
 					<svg
 						class="inline-block h-4 w-4 fill-current align-top md:h-5 md:w-5"
-						version="1.1"
 						xmlns="http://www.w3.org/2000/svg"
 						width="16"
 						height="16"

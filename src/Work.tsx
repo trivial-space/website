@@ -4,8 +4,8 @@ import { Icon } from 'solid-heroicons'
 import { arrowsPointingOut, xMark } from 'solid-heroicons/outline'
 import { arrowPath } from 'solid-heroicons/solid'
 import { createEffect, createMemo, createSignal, Show } from 'solid-js'
-import { Motion, Presence } from './solid-motionone' // TODO: replace with the original library once https://github.com/solidjs-community/solid-motionone/pull/11 is published
 import { useState } from './State'
+import { createPresence } from './utils'
 
 interface Props {
 	img: string
@@ -16,6 +16,13 @@ interface Props {
 	url: string
 	background: string
 }
+
+export const browseScale = 0.6
+// gap between works, relative to the browsing size of the smaller max dimension
+const gapFactor = 0.7
+
+// room around the reflection for its blur, 3x the largest blur radius
+const reflectionPad = 75
 
 const maxSizeBig = 1100
 const maxSizeWidthFactor = 0.98
@@ -31,23 +38,20 @@ export default function Work(props: Props) {
 
 	const aspectRatio = createMemo(() => props.width / props.height)
 
-	const dimensions = createMemo(() => {
-		const maxWidth = Math.min(
-			state.window.width * maxSizeWidthFactor,
-			maxSizeBig,
-		)
+	const maxSize = createMemo(() => ({
+		width: Math.min(state.window.width * maxSizeWidthFactor, maxSizeBig),
+		height: Math.min(state.window.height * maxSizeHeightFactor, maxSizeBig),
+	}))
 
-		const maxHeight = Math.min(
-			state.window.height * maxSizeHeightFactor,
-			maxSizeBig,
-		)
+	const size = (open: boolean) => {
+		const { width: maxWidth, height: maxHeight } = maxSize()
 
 		let height = 0
 		let width = 0
 
 		width = maxWidth
 
-		if (width < maxSizeBig && openNav()) {
+		if (width < maxSizeBig && open) {
 			height = maxHeight
 		} else {
 			height = maxWidth / aspectRatio()
@@ -58,9 +62,23 @@ export default function Work(props: Props) {
 		}
 
 		return { width: Math.floor(width), height: Math.floor(height) }
+	}
+
+	const dimensions = createMemo(() => size(openNav()))
+
+	// the layout slot is the browsing size plus a gap scaled with the gallery,
+	// so the spacing keeps its proportion on every screen. it never changes when
+	// opening, so the work stays centered on the cylinder and overflows evenly
+	const slotWidth = createMemo(() => {
+		const { width, height } = maxSize()
+		const gap = gapFactor * browseScale * Math.min(width, height)
+		return browseScale * size(false).width + gap
 	})
 
-	let iframe: HTMLIFrameElement | null = null
+	const overlay = createPresence(isPlaying, 1600)
+	const sketch = createPresence(isPlaying, 500)
+
+	let iframe: HTMLIFrameElement | undefined
 
 	let timeout: number
 	createEffect(() => {
@@ -96,50 +114,48 @@ export default function Work(props: Props) {
 	const debouncedFocus = debounce(() => {
 		if (iframe) {
 			iframe.focus()
-			iframe.contentWindow.focus()
+			iframe.contentWindow?.focus()
 		}
 	}, 100)
 
 	return (
 		<>
-			<Presence>
-				<Show when={isPlaying()}>
-					<Motion.div
-						class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 0.6 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 1.6 }}
-					/>
-				</Show>
-			</Presence>
+			<Show when={overlay.mounted()}>
+				<div
+					class="pointer-events-none fixed inset-0 z-40 h-full w-full bg-slate-800 transition-opacity duration-1600"
+					classList={{
+						'opacity-60': overlay.shown(),
+						'opacity-0': !overlay.shown(),
+					}}
+				/>
+			</Show>
 			<div
-				style={{ perspective: '1000px' }}
 				data-id={props.slug}
-				class="relative -mx-8 -mt-8 transition-transform delay-200 duration-500 ease-in-out md:-mx-20"
+				class="cylinder-panel relative -mt-8 will-change-transform"
 				classList={{
-					['scale-[0.60] translate-y-0']: !isTop(),
-					['scale-100 translate-y-[5vh]']: isTop(),
 					['z-0']: !isTop(),
 					['z-50']: isTop(),
 				}}
 			>
 				<div
-					class="work-link relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out md:mx-8"
+					class="work-link relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out"
 					classList={{
+						'translate-y-[5vh]': isTop(),
 						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
 						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
 					}}
 					style={{
 						width: dimensions().width + 'px',
 						height: dimensions().height + 'px',
+						'margin-inline': (slotWidth() - dimensions().width) / 2 + 'px',
+						scale: isTop() ? 1 : browseScale,
 					}}
 				>
 					<A href="/" class="absolute -top-6 right-0 opacity-50 md:-top-7">
 						<Icon path={xMark} class="size-5 text-white" />
 					</A>
 					<div
-						class="h-full w-full rounded-md border-[4px]"
+						class="relative h-full w-full rounded-md border-4"
 						classList={{
 							'shadow-xl shadow-slate-900/35': openNav(),
 						}}
@@ -148,62 +164,66 @@ export default function Work(props: Props) {
 							'border-color': props.background,
 						}}
 					>
-						<Presence exitBeforeEnter initial={false}>
-							<Show
-								when={isPlaying()}
-								fallback={
-									<Motion.div
-										class="h-full w-full"
-										initial={{ opacity: 0 }}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-										transition={{ duration: 0.5, endDelay: 0.5 }}
-									>
-										<A href={`/${props.slug}`} replace>
-											<img
-												alt={props.slug}
-												src={props.img}
-												class="h-full w-full object-contain"
-												width={props.width}
-												height={props.height}
-											/>
-										</A>
-									</Motion.div>
-								}
-							>
-								<Motion.iframe
-									ref={iframe}
-									class="h-full w-full overflow-hidden"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									transition={{
-										duration: 0.5,
-										delay: props.active ? 0.5 : 0,
-										endDelay: 0.3,
-									}}
-									src={props.url}
-									width={dimensions().width}
-									height={dimensions().height}
-									onMouseOver={debouncedFocus}
-								></Motion.iframe>
-							</Show>
-						</Presence>
+						{/* cross fade: the thumbnail fades out before the sketch fades in, and back */}
+						<div
+							class="h-full w-full transition-opacity duration-500"
+							classList={{
+								'opacity-0': isPlaying(),
+								'delay-800': !isPlaying(),
+							}}
+						>
+							<A href={`/${props.slug}`} replace>
+								<img
+									alt={props.slug}
+									src={props.img}
+									class="h-full w-full object-contain"
+									width={props.width}
+									height={props.height}
+								/>
+							</A>
+						</div>
+						<Show when={sketch.mounted()}>
+							<iframe
+								ref={iframe}
+								class="absolute inset-0 h-full w-full overflow-hidden transition-opacity duration-500"
+								classList={{
+									'opacity-0': !sketch.shown(),
+									'delay-1500': sketch.shown() && props.active,
+									'delay-1000': sketch.shown() && !props.active,
+								}}
+								src={props.url}
+								width={dimensions().width}
+								height={dimensions().height}
+								onMouseOver={debouncedFocus}
+							></iframe>
+						</Show>
 					</div>
 
-					<img
-						class="pointer-events-none -z-10 h-full w-full border-4 border-b-8 border-slate-800 opacity-25 blur-[18px] md:blur-[20px] lg:blur-[25px]"
-						alt={props.slug}
-						src={props.img}
-						width={props.width}
-						height={props.height}
+					{/* reflection on the ground. the mask fades it out away from the work
+					    (before the flip, so towards the top). the padding keeps the blur
+					    inside the masked area, which would otherwise clip it */}
+					<div
+						class="pointer-events-none -z-10"
 						style={{
+							margin: `-${reflectionPad}px`,
+							padding: `${reflectionPad}px`,
+							width: `calc(100% + ${2 * reflectionPad}px)`,
+							height: `calc(100% + ${2 * reflectionPad}px)`,
 							transform: `translateY(${
 								100 * 0.89 - (window.innerHeight * 14) / window.innerWidth
 							}vh) scaleY(-1.6)`,
-							'transform-origin': 'center 36%',
+							'transform-origin': `center calc(${reflectionPad}px + (100% - ${2 * reflectionPad}px) * 0.36)`,
+							'mask-image': 'linear-gradient(to top, black, transparent 80%)',
 						}}
-					/>
+					>
+						<img
+							class="h-full w-full border-4 border-b-8 border-slate-800 opacity-25 blur-[20px] md:blur-[24px] lg:blur-[30px]"
+							alt={props.slug}
+							src={props.img}
+							width={props.width}
+							height={props.height}
+						/>
+					</div>
 
 					<div
 						class="absolute inset-0 top-full -z-10 mx-2 h-fit overflow-y-hidden rounded-b-lg bg-stone-300 py-1 shadow-xl transition-all duration-1000 ease-in-out md:mx-4"
