@@ -11,7 +11,7 @@ import {
 	onMount,
 	Show,
 } from 'solid-js'
-import { createReflection } from './reflection'
+import { createReflection, Reflection } from './reflection'
 import { useState } from './State'
 import { createPresence } from './utils'
 
@@ -80,7 +80,7 @@ export default function Work(props: Props) {
 		return browseScale * size(false).width + gap
 	})
 
-	const [reflection, setReflection] = createSignal<string>()
+	const [reflection, setReflection] = createSignal<Reflection>()
 	onMount(() => {
 		createReflection(props.img, props.background).then(
 			setReflection,
@@ -88,8 +88,8 @@ export default function Work(props: Props) {
 		)
 	})
 	onCleanup(() => {
-		const url = reflection()
-		if (url) URL.revokeObjectURL(url)
+		const r = reflection()
+		if (r) URL.revokeObjectURL(r.src)
 	})
 
 	const overlay = createPresence(isPlaying, 1600)
@@ -225,18 +225,22 @@ export default function Work(props: Props) {
 					</div>
 
 					<Show when={reflection()}>
-						{(src) => (
+						{(r) => (
+							// right below the work, enlarged by the blur padding around the image
 							<img
-								class="pointer-events-none -z-10 h-full w-full opacity-25 blur-[20px] transition-opacity duration-1000 md:blur-[24px] lg:blur-[30px] starting:opacity-0"
+								class="pointer-events-none absolute -z-10 max-w-none opacity-25 transition-opacity duration-1000 starting:opacity-0"
 								alt=""
-								src={src()}
-								width={props.width}
-								height={props.height}
+								src={r().src}
 								style={{
+									left: `${-r().padX * 100}%`,
+									top: `${(1 - r().padY) * 100}%`,
+									width: `${(1 + 2 * r().padX) * 100}%`,
+									height: `${(1 + 2 * r().padY) * 100}%`,
 									transform: `translateY(${
 										100 * 0.89 - (state.window.height * 14) / state.window.width
 									}vh) scaleY(-1.5)`,
-									'transform-origin': 'center 35%',
+									// 35% of the image height, shifted by the padding
+									'transform-origin': `center ${((r().padY + 0.35) / (1 + 2 * r().padY)) * 100}%`,
 								}}
 							/>
 						)}
