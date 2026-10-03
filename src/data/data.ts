@@ -8,7 +8,7 @@ export interface Sketch {
 	background: string
 }
 
-function getImageUrl(name) {
+function getImageUrl(name: string) {
 	return new URL(`./imgs/${name}.png`, import.meta.url).href
 }
 

@@ -28,7 +28,7 @@ const Layout = (props: ParentProps) => {
 				<span class="whitespace-nowrap">
 					Made with 🖤 by <a href="https://trival.xyz">Thomas Gorny</a>
 				</span>
-				<span class="flex-grow" />
+				<span class="grow" />
 				<a href="https://github.com/trivial-space" class="whitespace-nowrap">
 					Open source &nbsp;
 					<svg

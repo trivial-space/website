@@ -14,7 +14,7 @@ import { data } from './data/data'
 
 export default function Gallery() {
 	const params = useParams()
-	let galleryEl: HTMLDivElement
+	let galleryEl!: HTMLDivElement
 
 	const workId = createMemo(() => params.id)
 	const state = useState()
@@ -82,7 +82,7 @@ export default function Gallery() {
 	return (
 		<div
 			class="gallery flex h-full flex-nowrap items-center overflow-x-auto overflow-y-hidden px-[30vw] pb-[8vh] transition-transform"
-			classList={{ ['!overflow-hidden']: !!workId() && lockScroll() }}
+			classList={{ ['overflow-hidden!']: !!workId() && lockScroll() }}
 			ref={galleryEl}
 		>
 			<For each={data.sketches}>

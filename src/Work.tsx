@@ -60,7 +60,7 @@ export default function Work(props: Props) {
 		return { width: Math.floor(width), height: Math.floor(height) }
 	})
 
-	let iframe: HTMLIFrameElement | null = null
+	let iframe: HTMLIFrameElement | undefined
 
 	let timeout: number
 	createEffect(() => {
@@ -96,7 +96,7 @@ export default function Work(props: Props) {
 	const debouncedFocus = debounce(() => {
 		if (iframe) {
 			iframe.focus()
-			iframe.contentWindow.focus()
+			iframe.contentWindow?.focus()
 		}
 	}, 100)
 
