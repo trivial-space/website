@@ -155,11 +155,9 @@ export default function Work(props: Props) {
 				}}
 			>
 				<div
-					class="work-link relative z-50 my-auto block origin-center rounded-md bg-white object-contain shadow-2xl shadow-slate-600/40 delay-200 duration-500 ease-in-out"
+					class="work-link relative z-50 my-auto block origin-center delay-200 duration-500 ease-in-out"
 					classList={{
 						'translate-y-[5vh]': isTop(),
-						'blur-[2px] md:blur-[3px]': !props.active && !params.id,
-						'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
 					}}
 					style={{
 						width: dimensions().width + 'px',
@@ -168,52 +166,62 @@ export default function Work(props: Props) {
 						scale: isTop() ? 1 : browseScale,
 					}}
 				>
-					<A href="/" class="absolute -top-6 right-0 opacity-50 md:-top-7">
-						<Icon path={xMark} class="size-5 text-white" />
-					</A>
+					{/* the blur stays on the card, safari clips the overflowing
+					    descendants of filtered elements, like the reflection */}
 					<div
-						class="relative h-full w-full rounded-md border-4"
+						class="relative h-full w-full rounded-md bg-white shadow-2xl shadow-slate-600/40 transition-[filter] delay-200 duration-500 ease-in-out"
 						classList={{
-							'shadow-xl shadow-slate-900/35': openNav(),
-						}}
-						style={{
-							'background-color': props.background,
-							'border-color': props.background,
+							'blur-[2px] md:blur-[3px]': !props.active && !params.id,
+							'blur-[8px] md:blur-[10px]': !props.active && !!params.id,
 						}}
 					>
-						{/* cross fade: the thumbnail fades out before the sketch fades in, and back */}
+						<A href="/" class="absolute -top-6 right-0 opacity-50 md:-top-7">
+							<Icon path={xMark} class="size-5 text-white" />
+						</A>
 						<div
-							class="h-full w-full transition-opacity duration-500"
+							class="relative h-full w-full rounded-md border-4"
 							classList={{
-								'opacity-0': isPlaying(),
-								'delay-800': !isPlaying(),
+								'shadow-xl shadow-slate-900/35': openNav(),
+							}}
+							style={{
+								'background-color': props.background,
+								'border-color': props.background,
 							}}
 						>
-							<A href={`/${props.slug}`} replace>
-								<img
-									alt={props.slug}
-									src={props.img}
-									class="h-full w-full object-contain"
-									width={props.width}
-									height={props.height}
-								/>
-							</A>
-						</div>
-						<Show when={sketch.mounted()}>
-							<iframe
-								ref={iframe}
-								class="absolute inset-0 h-full w-full overflow-hidden transition-opacity duration-500"
+							{/* cross fade: the thumbnail fades out before the sketch fades in, and back */}
+							<div
+								class="h-full w-full transition-opacity duration-500"
 								classList={{
-									'opacity-0': !sketch.shown(),
-									'delay-1500': sketch.shown() && props.active,
-									'delay-1000': sketch.shown() && !props.active,
+									'opacity-0': isPlaying(),
+									'delay-800': !isPlaying(),
 								}}
-								src={props.url}
-								width={dimensions().width}
-								height={dimensions().height}
-								onMouseOver={debouncedFocus}
-							></iframe>
-						</Show>
+							>
+								<A href={`/${props.slug}`} replace>
+									<img
+										alt={props.slug}
+										src={props.img}
+										class="h-full w-full object-contain"
+										width={props.width}
+										height={props.height}
+									/>
+								</A>
+							</div>
+							<Show when={sketch.mounted()}>
+								<iframe
+									ref={iframe}
+									class="absolute inset-0 h-full w-full overflow-hidden transition-opacity duration-500"
+									classList={{
+										'opacity-0': !sketch.shown(),
+										'delay-1500': sketch.shown() && props.active,
+										'delay-1000': sketch.shown() && !props.active,
+									}}
+									src={props.url}
+									width={dimensions().width}
+									height={dimensions().height}
+									onMouseOver={debouncedFocus}
+								></iframe>
+							</Show>
+						</div>
 					</div>
 
 					<Show when={reflection()}>
