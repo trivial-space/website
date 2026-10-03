@@ -9,7 +9,7 @@ export interface Sketch {
 }
 
 function getImageUrl(name: string) {
-	return new URL(`./imgs/${name}.png`, import.meta.url).href
+	return new URL(`./imgs/${name}.webp`, import.meta.url).href
 }
 
 export const data: { sketches: Sketch[] } = {
