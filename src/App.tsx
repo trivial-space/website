@@ -17,7 +17,7 @@ const Layout = (props: ParentProps) => {
 			}}
 		>
 			<header class="fixed top-0">
-				<h1 class="m-2 mb-0 text-2xl font-extralight uppercase tracking-widest md:m-4 md:text-4xl">
+				<h1 class="m-2 mb-0 text-2xl font-extralight tracking-widest uppercase md:m-4 md:text-4xl">
 					trivial space
 				</h1>
 			</header>
@@ -26,7 +26,8 @@ const Layout = (props: ParentProps) => {
 
 			<footer class="fixed bottom-0 flex w-full flex-wrap items-center gap-2 p-2 text-xs text-gray-700 md:p-4 md:text-base">
 				<span class="whitespace-nowrap">
-					Made with 🖤 by <a href="https://trival.xyz">Thomas Gorny</a>
+					Made with <span class="mx-0.5 inline-block text-sm">🖤</span> by{' '}
+					<a href="https://trival.xyz">Thomas Gorny</a>
 				</span>
 				<span class="grow" />
 				<a href="https://github.com/trivial-space" class="whitespace-nowrap">
