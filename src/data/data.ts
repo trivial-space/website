@@ -17,7 +17,7 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'colorfields',
 			img: getImageUrl('colorfields'),
-			href: 'https://sketches.trivialspace.net/experiments/paintings/tile-fields/',
+			href: 'https://sketches-old.trivialspace.net/experiments/paintings/tile-fields/',
 			allowFullscreen: false,
 			width: 1808,
 			height: 1494,
@@ -26,7 +26,7 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'colorwalls',
 			img: getImageUrl('colorwalls'),
-			href: 'https://sketches.trivialspace.net/works/colorwalls/',
+			href: 'https://sketches-old.trivialspace.net/works/colorwalls/',
 			allowFullscreen: true,
 			width: 1811,
 			height: 1471,
@@ -35,7 +35,7 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'glassplates',
 			img: getImageUrl('glassplates'),
-			href: 'https://sketches.trivialspace.net/experiments/wasm/projection/',
+			href: 'https://sketches-old.trivialspace.net/experiments/wasm/projection/',
 			allowFullscreen: true,
 			width: 1811,
 			height: 1471,
@@ -44,7 +44,7 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'stroke',
 			img: getImageUrl('stroke'),
-			href: 'https://sketches.trivialspace.net/experiments/strokes/stroke2/',
+			href: 'https://sketches-old.trivialspace.net/experiments/strokes/stroke2/',
 			allowFullscreen: false,
 			width: 1713,
 			height: 1517,
@@ -53,7 +53,7 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'tiles',
 			img: getImageUrl('tiles'),
-			href: 'https://sketches.trivialspace.net/works/tiles/',
+			href: 'https://sketches-old.trivialspace.net/works/tiles/',
 			allowFullscreen: true,
 			width: 1558,
 			height: 1555,
@@ -62,7 +62,7 @@ export const data: { sketches: Sketch[] } = {
 		{
 			slug: 'homage',
 			img: getImageUrl('homage'),
-			href: 'https://sketches.trivialspace.net/works/homage/',
+			href: 'https://sketches-old.trivialspace.net/works/homage/',
 			allowFullscreen: true,
 			width: 2309,
 			height: 1535,
