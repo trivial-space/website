@@ -24,6 +24,15 @@ export const data: { sketches: Sketch[] } = {
 			background: 'white',
 		},
 		{
+			slug: 'columns',
+			img: getImageUrl('columns'),
+			href: 'https://sketches.trivialspace.net/rooms/columns/',
+			allowFullscreen: true,
+			width: 1200,
+			height: 800,
+			background: 'white',
+		},
+		{
 			slug: 'colorwalls',
 			img: getImageUrl('colorwalls'),
 			href: 'https://sketches-old.trivialspace.net/works/colorwalls/',
