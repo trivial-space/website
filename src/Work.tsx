@@ -17,6 +17,7 @@ import { createPresence } from './utils'
 
 interface Props {
 	img: string
+	title: string
 	slug: string
 	active: boolean
 	width: number
@@ -198,7 +199,7 @@ export default function Work(props: Props) {
 							>
 								<A href={`/${props.slug}`} replace>
 									<img
-										alt={props.slug}
+										alt={props.title}
 										src={props.img}
 										class="h-full w-full object-contain"
 										width={props.width}
@@ -254,7 +255,7 @@ export default function Work(props: Props) {
 						}}
 					>
 						<nav class="flex items-center gap-4 overflow-x-auto px-3 md:px-6 md:py-1">
-							<h2 class="font-bold md:text-lg">{props.slug}</h2>
+							<h2 class="font-bold md:text-lg">{props.title}</h2>
 							<span class="grow" />
 							<button onClick={() => refresh()} title="reload" class="p-1">
 								<Icon path={arrowPath} class="size-5" />

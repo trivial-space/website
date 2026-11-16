@@ -176,6 +176,7 @@ export default function Gallery() {
 						return (
 							<Work
 								img={sketch.img}
+								title={sketch.title}
 								slug={sketch.slug}
 								active={sketch.slug === workId()}
 								width={sketch.width}
